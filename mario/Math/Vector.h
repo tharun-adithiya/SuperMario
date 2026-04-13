@@ -1,6 +1,7 @@
 #pragma once
 #include <math.h>
-
+#include <iostream>
+using namespace std;
 struct Vector2D
 {
     float x;
@@ -14,6 +15,11 @@ struct Vector2D
     Vector2D operator*(const Vector2D& other) const { return Vector2D(x * other.x, y * other.y); }
     Vector2D operator/(const Vector2D& other) const { return Vector2D(x / other.x, y / other.y); }
     Vector2D operator*(float multiplier)      const { return Vector2D(x * multiplier, y * multiplier); }
+
+    void print() const
+    {
+        cout << "Vector2D(%.2f, %.2f)\n" << x << ", " << y << ")\n";
+    }
 
     Vector2D& operator+=(const Vector2D& other)
     {
@@ -38,6 +44,11 @@ struct Vector2D
     static Vector2D Direction(const Vector2D& from, const Vector2D& to)
     {
         return to - from;                         
+    }
+
+    static Vector2D Lerp(const Vector2D& start, const Vector2D& end, float t)
+    {
+        return start + (end - start) * t;        
     }
 
     static float Distance(const Vector2D& from, const Vector2D& to)

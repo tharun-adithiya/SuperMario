@@ -1,10 +1,13 @@
 #pragma once
 #include <raylib.h>
 #include "Entities/Player.h"
+#include "World/Tilemap.h"
+
 class Game
 {
     private:
         Player player;
+        Tilemap tilemap;
     public:
         void Init();
         void Update(float dt);
