@@ -7,8 +7,9 @@ class Game
 {
     private:
         Player player;
-        Tilemap tilemap;
+        
     public:
+        static Tilemap tilemap;
         void Init();
         void Update(float dt);
         void Render();

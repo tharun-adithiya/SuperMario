@@ -23,4 +23,5 @@ class Tilemap
     void Render();
 
     int GetTile(int x, int y) const; // Get tile type at specific coordinates
+    int GetTileSize() { return tileSize; } 
 };

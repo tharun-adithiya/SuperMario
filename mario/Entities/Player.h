@@ -8,7 +8,7 @@ class Player
         Vector2D velocity;
         float height;
         float width;
-        float gravity = 9.81*10;
+        float gravity = 9.81*30;
         float maxFallSpeed = 1000;
         float speed=100;
         float jumpHeight=50;

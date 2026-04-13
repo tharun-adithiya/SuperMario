@@ -3,12 +3,16 @@
 #include <raylib.h>
 #include "Math/Vector.h"
 #include "Player.h"
+#include "World/Tilemap.h"
+#include "Core/Game.h"
+#include "iostream"
+using namespace std;
 Player::Player()
 {
     position = Vector2D(100, 100);
     velocity = Vector2D(0, 0);
     width = 50;
-    height = 50;
+    height = 100;
 }
 
 void Player::Update(float dt)
@@ -21,7 +25,7 @@ void Player::Update(float dt)
 
     if(IsGrounded()) // Simple ground collision check
     {
-        position.y = GetScreenHeight() - height;
+        position.y = Game::tilemap.GetTileSize() * (static_cast<int>((position.y+height) / Game::tilemap.GetTileSize()))-height; // Snap player to the top of the ground tile
         velocity.y = 0;
     }
     
@@ -54,7 +58,8 @@ void Player::Jump()
 
 bool Player::IsGrounded()
 {
-    return position.y >= GetScreenHeight() - height;
+    return Game::tilemap.GetTile(position.x / Game::tilemap.GetTileSize(), (position.y+height) / Game::tilemap.GetTileSize()) == TileType::Ground;
+    //return position.y >= GetScreenHeight() - height;
 }
 void Player::ApplyGravity(float dt)     // This function applies gravity to the player, affecting the vertical velocity and position
 {
