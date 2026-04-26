@@ -17,6 +17,7 @@ void Tilemap::Load()
 
     for(int x=0;x<width;x++)
     {
+        if(x==width-1) break;
         grid[height-1][x] = TileType::Ground; // Set bottom row to ground
     }
     grid[height-5][5] = TileType::Ground; // Add a floating platform for testing
@@ -45,3 +46,4 @@ int Tilemap::GetTile(int x, int y) const
         return -1; // Out of bounds
     return grid[y][x];
 }
+

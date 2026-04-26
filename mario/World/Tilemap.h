@@ -1,5 +1,6 @@
 #pragma once
 #include "vector"
+#include "Math/AABB.h"
 using namespace std;
 
 enum TileType
@@ -24,4 +25,6 @@ class Tilemap
 
     int GetTile(int x, int y) const; // Get tile type at specific coordinates
     int GetTileSize() { return tileSize; } 
+    AABB GetTileAABB(int x, int y) { return AABB(Vector2D(x*tileSize, y*tileSize), Vector2D((x+1)*tileSize, (y+1)*tileSize)); } //Gets AABB for a specific tile.
+    
 };
