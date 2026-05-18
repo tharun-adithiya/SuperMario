@@ -6,6 +6,7 @@ class Player
     private:
         Vector2D position;
         Vector2D velocity;
+        Vector2D playerCenter;
         AABB hitBox;
         float height;
         float width;
@@ -24,4 +25,6 @@ class Player
         bool IsGrounded();
         void ApplyGravity(float dt);
         Vector2D GetPosition() const { return position; }
+        int getHitboxHeight() const {return hitBox.getHeight();}
+        int getHitboxWidth() const {return hitBox.getWidth();}
 };

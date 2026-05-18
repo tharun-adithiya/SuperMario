@@ -24,7 +24,8 @@ void Game::Render()
     ClearBackground(BLUE);
     player.Render();
     tilemap.Render();
-    DrawDebugPosition(player.GetPosition());
+    Debug::DrawDebugPosition(player.GetPosition());
+    Debug::DrawPlayerHitBox(player.GetPosition().x, player.GetPosition().y, player.getHitboxHeight(),player.getHitboxWidth());
     EndDrawing();
 }
 

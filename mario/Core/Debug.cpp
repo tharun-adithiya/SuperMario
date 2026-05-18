@@ -1,6 +1,7 @@
 #include "Debug.h"
 # include "raylib.h"
-void DrawDebugPosition(const Vector2D& position)
+
+void Debug::DrawDebugPosition(const Vector2D& position)
 {
     const int fontSize = 20;
     const int padding = 10;
@@ -12,4 +13,9 @@ void DrawDebugPosition(const Vector2D& position)
     int x= GetScreenWidth() - textWidth - padding;
     int y= padding;
     DrawText(text, x, y, fontSize, WHITE);
+}
+
+void Debug::DrawPlayerHitBox(int posX, int posY, int length, int width)
+{
+    DrawRectangleLines(posX, posY, width, length, GREEN);
 }

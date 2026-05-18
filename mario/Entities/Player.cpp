@@ -10,9 +10,12 @@ using namespace std;
 Player::Player()
 {
     position = Vector2D(100, 100);
+    playerCenter = Vector2D(position.x + width/2, position.y + height/2);
     velocity = Vector2D(0, 0);
     width = 50;
     height = 100;
+    hitBox= AABB(Vector2D(playerCenter.x - width/2, playerCenter.y - height/2), 
+                 Vector2D(playerCenter.x + width/2, playerCenter.y + height/2));
 }
 
 void Player::Update(float dt)

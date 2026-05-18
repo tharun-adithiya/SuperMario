@@ -22,4 +22,12 @@ struct AABB
     {
         return ((min.x<=other.max.x&& max.x>=other.min.x)&&(min.y<=other.max.y&& max.y>=other.min.y));
     }
+    int getWidth() const
+    {
+        return max.x - min.x;
+    }
+    int getHeight() const
+    {
+        return max.y - min.y;
+    }
 };
