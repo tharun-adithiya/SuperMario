@@ -19,3 +19,15 @@ void Debug::DrawPlayerHitBox(int posX, int posY, int length, int width)
 {
     DrawRectangleLines(posX, posY, width, length, GREEN);
 }
+
+void Debug:: DrawWorldGrid(int tileSize, int screenWidth, int screenHeight)
+{
+    for (int x = 0; x < screenWidth; x += tileSize)
+    {
+        DrawLine(x, 0, x, screenHeight, GRAY);
+    }
+    for (int y = 0; y < screenHeight; y += tileSize)
+    {
+        DrawLine(0, y, screenWidth, y, GRAY);
+    }
+}

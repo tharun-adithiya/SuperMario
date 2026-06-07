@@ -5,7 +5,7 @@
 #include "Player.h"
 #include "World/Tilemap.h"
 #include "Core/Game.h"
-#include "iostream"
+
 using namespace std;
 Player::Player()
 {
@@ -25,7 +25,7 @@ void Player::Update(float dt)
     ApplyGravity(dt);
 
     Move(dt);
-
+    
     if(IsGrounded()) // Simple ground collision check
     {
         position.y = Game::tilemap.GetTileSize() * (static_cast<int>((position.y+height) / Game::tilemap.GetTileSize()))-height; // Snap player to the top of the ground tile
@@ -52,6 +52,7 @@ void Player::Move(float dt)               // This function updates the player's 
 {
     velocity.x = inputAxisX * speed;
     position += velocity * dt;
+    
 }
 
 void Player::Jump()

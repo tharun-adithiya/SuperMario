@@ -14,6 +14,7 @@ struct Vector2D
     Vector2D operator-(const Vector2D& other) const { return Vector2D(x - other.x, y - other.y); }
     Vector2D operator*(const Vector2D& other) const { return Vector2D(x * other.x, y * other.y); }
     Vector2D operator/(const Vector2D& other) const { return Vector2D(x / other.x, y / other.y); }
+    Vector2D operator/(const float& other) const { return Vector2D(x / other, y / other); }
     Vector2D operator*(float multiplier)      const { return Vector2D(x * multiplier, y * multiplier); }
 
     void print() const
@@ -63,3 +64,12 @@ struct Vector2D
         return a.x * b.x + a.y * b.y;
     }
 };
+inline Vector2D operator/(float scalar, const Vector2D& vec)
+{
+    return Vector2D(scalar / vec.x, scalar / vec.y);
+}
+
+inline Vector2D operator*(float scalar, const Vector2D& vec)
+{
+    return Vector2D(scalar * vec.x, scalar * vec.y);
+}

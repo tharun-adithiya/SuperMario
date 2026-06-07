@@ -20,9 +20,9 @@ void Tilemap::Load()
         if(x==width-1) break;
         grid[height-1][x] = TileType::Ground; // Set bottom row to ground
     }
-    grid[height-5][5] = TileType::Ground; // Add a floating platform for testing
+    /*grid[height-5][5] = TileType::Ground; // Add a floating platform for testing
     grid[height-5][6] = TileType::Ground;
-    grid[height-5][7] = TileType::Ground;
+    grid[height-5][7] = TileType::Ground;*/
 }
 
 void Tilemap::Render()
