@@ -19,9 +19,11 @@ void Game::Init()
 void Game::Update(float dt)
 {
     player.Update(dt);
-    Vector2D rayPoint= {20,20};
+    /*Vector2D rayPoint= {20,20};
     Vector2D mousePos= {GetMousePosition().x,GetMousePosition().y};
-    MyRect playerRect= {Vector2D(GetScreenWidth()/2,GetScreenHeight()/2), Vector2D(50,50)};
+    int gridX = static_cast<int>(mousePos.x) / tilemap.GetTileSize();
+    int gridY = static_cast<int>(mousePos.y) / tilemap.GetTileSize();
+    MyRect playerRect= {Vector2D(50,50), Vector2D(GetScreenWidth()/2,GetScreenHeight()/2),Vector2D(0,0)};
     Vector2D rayDir= mousePos-rayPoint;
     DrawRectangle(playerRect.position.x,playerRect.position.y,playerRect.size.x,playerRect.size.y,BLACK);
     DrawLine(rayPoint.x,rayPoint.y,mousePos.x,mousePos.y,GREEN);
@@ -35,10 +37,16 @@ void Game::Update(float dt)
         DrawCircle(cPoint.x, cPoint.y, 10, RED);
         DrawLineEx(Vector2{cPoint.x, cPoint.y}, Vector2{endPoint.x, endPoint.y}, 3.0f, YELLOW); 
     }
+    if(AABB::RayVsRect(rayPoint,rayDir,tilemap.GetActualTile(gridX,gridY).collider,t, cPoint, cNormal) && t < 1.0f)
+    {
+        Vector2D endPoint = cPoint + cNormal * 30.0f; 
+        DrawCircle(cPoint.x, cPoint.y, 10, RED);
+        DrawLineEx(Vector2{cPoint.x, cPoint.y}, Vector2{endPoint.x, endPoint.y}, 3.0f, YELLOW); 
+    }
     else
     {
         DrawRectangle(playerRect.position.x,playerRect.position.y,playerRect.size.x,playerRect.size.y,BLACK);
-    }
+    }*/
 
 }
 
