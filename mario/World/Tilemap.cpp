@@ -29,11 +29,21 @@ void Tilemap::Load()
         Vector2D tilePos = Vector2D(x * tileSize, (height - 3) * tileSize);
         grid2[height-3][x]=Tile(MyRect(Vector2D(tileSize, tileSize), tilePos), TileType::Ground);
     }
+    for(int y=3;y<7;y++)
+    {
+        Vector2D tilePos = Vector2D(10 * tileSize, (height - y) * tileSize);
+        grid2[height-y][10]=Tile(MyRect(Vector2D(tileSize, tileSize), tilePos), TileType::Ground);
+    }
+    
+    grid2[height-5][9]=Tile(MyRect(Vector2D(tileSize, tileSize), Vector2D(9*tileSize,(height-5)*tileSize)),TileType::Ground);
+    grid2[height-4][9]=Tile(MyRect(Vector2D(tileSize, tileSize), Vector2D(9*tileSize,(height-5)*tileSize)),TileType::Ground);
+    grid2[height-3][9]=Tile(MyRect(Vector2D(tileSize, tileSize), Vector2D(9*tileSize,(height-3)*tileSize)),TileType::Ground);
+    grid2[height-4][8]=Tile(MyRect(Vector2D(tileSize, tileSize), Vector2D(8*tileSize,(height-4)*tileSize)),TileType::Ground);
+    grid2[height-3][8]=Tile(MyRect(Vector2D(tileSize, tileSize), Vector2D(8*tileSize,(height-3)*tileSize)),TileType::Ground);
+    grid2[height-2][8]=Tile(MyRect(Vector2D(tileSize, tileSize), Vector2D(8*tileSize,(height-2)*tileSize)),TileType::Ground);
     
 
-    /*grid[height-5][5] = TileType::Ground; // Add a floating platform for testing
-    grid[height-5][6] = TileType::Ground;
-    grid[height-5][7] = TileType::Ground;*/
+
 }
 
 void Tilemap::Render()
@@ -85,5 +95,36 @@ vector<Tile> Tilemap::GetSolidTiles()
             }
         }
     }
+    return solidTiles;
+}
+
+vector<Tile> Tilemap::GetNearbySolidTiles(const MyRect& bounds, Vector2D velocity, float dt)
+{
+    vector<Tile> solidTiles;
+    
+    //Calculates the bounding box of the player's entire movement path for this frame
+    float minX = std::min(bounds.position.x, bounds.position.x + velocity.x * dt);
+    float minY = std::min(bounds.position.y, bounds.position.y + velocity.y * dt);
+    float maxX = std::max(bounds.position.x + bounds.size.x, bounds.position.x + bounds.size.x + velocity.x * dt);
+    float maxY = std::max(bounds.position.y + bounds.size.y, bounds.position.y + bounds.size.y + velocity.y * dt);
+
+    // Converts to grid coordinates (and expand by 1 to be safe against floating point rounding)
+    int startX = std::max(0, (int)(minX / tileSize) - 1);
+    int startY = std::max(0, (int)(minY / tileSize) - 1);
+    int endX = std::min(width - 1, (int)(maxX / tileSize) + 1);
+    int endY = std::min(height - 1, (int)(maxY / tileSize) + 1);
+
+    // Loops through only this tiny section of the grid
+    for(int y = startY; y <= endY; y++)
+    {
+        for(int x = startX; x <= endX; x++)
+        {
+            if(grid2[y][x].tileType == TileType::Ground) 
+            {
+                solidTiles.push_back(grid2[y][x]);
+            }
+        }
+    }
+    
     return solidTiles;
 }

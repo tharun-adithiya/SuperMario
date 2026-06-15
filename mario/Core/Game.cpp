@@ -59,6 +59,7 @@ void Game::Render()
     Debug::DrawWorldGrid(tilemap.GetTileSize(), GetScreenWidth(), GetScreenHeight());
     Debug::DrawDebugPosition(player.GetPosition());
     Debug::DrawPlayerHitBox(player.GetPosition().x, player.GetPosition().y, player.getHitboxHeight(),player.getHitboxWidth());
+    Debug::DrawSweptArea(player.GetDebugSweptArea());
     EndDrawing();
 }
 

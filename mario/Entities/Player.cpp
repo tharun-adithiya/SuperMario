@@ -27,15 +27,22 @@ void Player::Update(float dt)
     isGrounded = false;
     debugHits.clear();
 
-    // Get all tiles once
-    vector<Tile> solidTiles = Game::tilemap.GetSolidTiles();
+    // Calculate the swept area for debugging
+    float minX = std::min(collider.position.x, collider.position.x + velocity.x * dt);
+    float minY = std::min(collider.position.y, collider.position.y + velocity.y * dt);
+    float maxX = std::max(collider.position.x + collider.size.x, collider.position.x + collider.size.x + velocity.x * dt);
+    float maxY = std::max(collider.position.y + collider.size.y, collider.position.y + collider.size.y + velocity.y * dt);
+    debugSweptArea = MyRect(Vector2D(maxX - minX, maxY - minY), Vector2D(minX, minY));
+
+    // Get only the tiles near the player's movement path
+    vector<Tile> solidTiles = Game::tilemap.GetNearbySolidTiles(collider, velocity, dt);
 
     // Loop a few times to allow for sliding off multiple walls/floors in one frame
     for (int i = 0; i < 4; i++) 
     {
         vector<CollisionInfo> hits;
 
-        // 1. Gather all current hits
+        // Gathers all current hits
         for(const Tile &tile : solidTiles)
         {
             CollisionInfo hit = AABB::DynamicRectVsRect(collider, tile.collider, dt);
@@ -45,15 +52,16 @@ void Player::Update(float dt)
             }
         }
 
-        // 2. If we didn't hit anything, we are safe to break out!
+        // If didn't hit anything, breaks out!
         if (hits.empty()) break;
 
-        // 3. Sort hits so we resolve the CLOSEST one first
+        //Sort hits so to resolve the closest one first
+
         std::sort(hits.begin(), hits.end(), [](const CollisionInfo& a, const CollisionInfo& b) {
             return a.collisionTime < b.collisionTime;
         });
 
-        // 4. Resolve only the FIRST hit
+        // Resolves only the first hit
         CollisionInfo firstHit = hits[0];
         
         if (firstHit.contactNormal.y == -1)
@@ -63,8 +71,9 @@ void Player::Update(float dt)
 
         CollisionResolver::Resolve(velocity, firstHit);
         debugHits.push_back(firstHit);
-        // 5. CRITICAL: Update the collider's velocity for the next loop iteration!
-        // This ensures we don't hit the internal cracks of the tiles!
+        
+        // Updating the collider's velocity for the next loop iteration
+        // This ensures that the player don't hit the internal cracks of the tiles
         collider.velocity = velocity;
     }
     
@@ -109,11 +118,10 @@ void Player::Render()
     DrawRectangle(position.x, position.y, width, height, RED);
     
     // Draw collision normal visualizers on top of the player
-
     for(const auto& hit : debugHits)
     {
         Vector2D endPoint = hit.contactPoint + hit.contactNormal * 30.0f; 
-        DrawCircle(hit.contactPoint.x, hit.contactPoint.y+height/2, 10, YELLOW);
-        DrawLineEx(Vector2{hit.contactPoint.x, hit.contactPoint.y+height/2}, Vector2{endPoint.x, endPoint.y+height/2}, 5.0f, GREEN);
+        DrawCircle(hit.contactPoint.x, hit.contactPoint.y, 10, YELLOW);
+        DrawLineEx(Vector2{hit.contactPoint.x, hit.contactPoint.y}, Vector2{endPoint.x, endPoint.y}, 3.0f, GREEN);
     }
 }

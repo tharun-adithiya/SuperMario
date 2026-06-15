@@ -40,6 +40,7 @@ class Tilemap
     int GetTile(int x, int y) const; // Get tile type at specific coordinates
     Tile GetActualTile(int x,int y) const;
     vector<Tile> GetSolidTiles();
+    vector<Tile> GetNearbySolidTiles(const MyRect& bounds, Vector2D velocity, float dt);
     int GetTileSize() { return tileSize; } 
     //AABB GetTileAABB(int x, int y) { return AABB(Vector2D(x*tileSize, y*tileSize), Vector2D((x+1)*tileSize, (y+1)*tileSize)); } //Gets AABB for a specific tile.
     

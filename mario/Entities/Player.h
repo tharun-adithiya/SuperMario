@@ -11,6 +11,7 @@ class Player
         AABB hitBox;
         MyRect collider;
         std::vector<CollisionInfo> debugHits;
+        MyRect debugSweptArea;
         bool isGrounded=false;
         float height;
         float width;
@@ -34,4 +35,5 @@ class Player
         int getHitboxWidth() const {return  collider.size.x;}
         Vector2D getVelocity() {return velocity;}
         void setVelocity(Vector2D velocity) {this->velocity=velocity;}
+        MyRect GetDebugSweptArea() const { return debugSweptArea; }
 };

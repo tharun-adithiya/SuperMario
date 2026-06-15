@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Vector.h"
+#include "Math/AABB.h"
 
 namespace Debug
 {
@@ -7,4 +8,5 @@ namespace Debug
     void DrawDebugPosition(const Vector2D& position);
     void DrawPlayerHitBox(int posX, int posY,int length, int width);
     void DrawWorldGrid(int tileSize, int screenWidth, int screenHeight);
+    void DrawSweptArea(const MyRect& sweptArea);
 }
