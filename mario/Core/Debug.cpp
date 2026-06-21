@@ -34,5 +34,5 @@ void Debug:: DrawWorldGrid(int tileSize, int screenWidth, int screenHeight)
 
 void Debug::DrawSweptArea(const MyRect& sweptArea)
 {
-    DrawRectangleLines(sweptArea.position.x, sweptArea.position.y, sweptArea.size.x+10, sweptArea.size.y+10, ORANGE);
+    DrawRectangleLines(sweptArea.position.x, sweptArea.position.y, sweptArea.size.x, sweptArea.size.y, ORANGE);
 }

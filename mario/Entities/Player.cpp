@@ -20,8 +20,22 @@ Player::Player()
 void Player::Update(float dt)
 {
     HandleInput();
+
     ApplyGravity(dt);
     
+    if(wasGrounded&&!isGrounded)
+    {
+        //cout<<"Coyote timer starts\n";
+        coyoteTime=coyoteTime;
+    }
+
+    if(!isGrounded)
+    { 
+        coyoteTimer-=dt;
+        //cout<<"coyote timer "<<coyoteTimer;
+    }
+    wasGrounded=isGrounded;
+
     velocity.x = inputAxisX * speed; 
     collider.velocity = velocity;
     isGrounded = false;
@@ -82,12 +96,13 @@ void Player::Update(float dt)
 }
 void Player::HandleInput()
 {
-    if(IsKeyPressed(KEY_W) && isGrounded) // Simple jump check, only allows jumping if player is on the ground
+    if(IsKeyPressed(KEY_W)&& (isGrounded || coyoteTimer>0)) // Simple jump check, only allows jumping if player is on the ground
     {
         Jump();
+        coyoteTimer=0;
     }
     
-    if (IsKeyDown(KEY_D)) inputAxisX = 1;
+    if (IsKeyDown(KEY_D)) {inputAxisX = 1; }
     
     else if (IsKeyDown(KEY_A)) inputAxisX = -1;
 

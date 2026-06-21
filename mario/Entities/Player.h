@@ -5,21 +5,32 @@
 class Player
 {
     private:
+        //Transform properties
         Vector2D position;
         Vector2D velocity;
         Vector2D playerCenter;
-        AABB hitBox;
+
+        //Collision properties
         MyRect collider;
         std::vector<CollisionInfo> debugHits;
         MyRect debugSweptArea;
-        bool isGrounded=false;
+
+        //Size properties
         float height;
         float width;
+
+        //Movement properties
+        bool isGrounded=false;
+        bool wasGrounded=false;
         float gravity = 9.81*30;
         float maxFallSpeed = 1000;
         float speed=100;
+        float coyoteTime=0.2;
         float jumpHeight=55;
+        float coyoteTimer=0;
         int inputAxisX=0;
+
+
     public:
         
         Player();
