@@ -25,14 +25,14 @@ void Player::Update(float dt)
     
     if(wasGrounded&&!isGrounded)
     {
-        //cout<<"Coyote timer starts\n";
-        coyoteTime=coyoteTime;
+        
+        coyoteTimer=coyoteTime;
     }
 
     if(!isGrounded)
     { 
         coyoteTimer-=dt;
-        //cout<<"coyote timer "<<coyoteTimer;
+        cout<<"coyote timer "<<coyoteTimer;
     }
     wasGrounded=isGrounded;
 
@@ -99,7 +99,7 @@ void Player::HandleInput()
     if(IsKeyPressed(KEY_W)&& (isGrounded || coyoteTimer>0)) // Simple jump check, only allows jumping if player is on the ground
     {
         Jump();
-        coyoteTimer=0;
+        coyoteTimer=0;          //Resetting coyote timer
     }
     
     if (IsKeyDown(KEY_D)) {inputAxisX = 1; }
