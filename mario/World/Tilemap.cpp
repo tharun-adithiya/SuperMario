@@ -52,7 +52,7 @@ void Tilemap::Render()
     {
         for(int x=0;x<width;x++)
         {
-            int tileType = grid[y][x];
+            // int tileType = grid[y][x]; // Unused
             Tile tile=grid2[y][x];
             /*if(tileType == TileType::Ground) // Ground tile
             {

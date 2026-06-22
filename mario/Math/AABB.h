@@ -31,7 +31,7 @@ struct CollisionInfo
     }
 
     CollisionInfo(bool hit, float collisionTime, Vector2D contactPoint,Vector2D contactNormal) : 
-    hit(hit), collisionTime(collisionTime), contactPoint(contactPoint), contactNormal(contactNormal)
+    hit(hit), collisionTime(collisionTime), contactNormal(contactNormal), contactPoint(contactPoint)
     {}
 };
 

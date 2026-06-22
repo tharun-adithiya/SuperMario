@@ -22,11 +22,12 @@ class Player
         //Movement properties
         bool isGrounded=false;
         bool wasGrounded=false;
-        float gravity = 9.81*30;
+        float gravity = 9.81*35;
         float maxFallSpeed = 1000;
         float speed=100;
         float coyoteTime=0.2;
-        float jumpHeight=55;
+        float jumpHeight=57;
+        float rateOfJump=0.0;
         float coyoteTimer=0;
         int inputAxisX=0;
 
@@ -35,10 +36,11 @@ class Player
         
         Player();
         void Update(float dt);
-        void HandleInput();
+        void HandleInput(float dt);
         void Render();
         void Move(float dt);
         void Jump();
+        void VariableJump(float step);
         bool IsGrounded();
         void ApplyGravity(float dt);
         Vector2D GetPosition() const { return position; }

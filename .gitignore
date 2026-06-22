@@ -1,0 +1,44 @@
+# Build output
+build/
+bin/
+Debug/
+Release/
+out/
+
+# Compiled files
+*.o
+*.obj
+*.exe
+*.out
+*.app
+*.dll
+*.so
+*.dylib
+
+# Debug symbols
+*.pdb
+*.ilk
+
+# Static / dynamic libs
+*.a
+*.lib
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# VS / VSCode
+.vscode/
+*.sln
+*.vcxproj*
+*.opensdf
+*.sdf
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

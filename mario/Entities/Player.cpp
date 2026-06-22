@@ -19,20 +19,19 @@ Player::Player()
 
 void Player::Update(float dt)
 {
-    HandleInput();
+    
+    HandleInput(dt);
 
     ApplyGravity(dt);
     
     if(wasGrounded&&!isGrounded)
     {
-        
         coyoteTimer=coyoteTime;
     }
 
     if(!isGrounded)
     { 
         coyoteTimer-=dt;
-        cout<<"coyote timer "<<coyoteTimer;
     }
     wasGrounded=isGrounded;
 
@@ -94,14 +93,18 @@ void Player::Update(float dt)
     position += velocity * dt;
     collider.position = position;
 }
-void Player::HandleInput()
+void Player::HandleInput(float dt)
 {
-    if(IsKeyPressed(KEY_W)&& (isGrounded || coyoteTimer>0)) // Simple jump check, only allows jumping if player is on the ground
+    if((IsKeyPressed(KEY_W)||IsKeyPressed(KEY_SPACE))&& (isGrounded || coyoteTimer>0)) // Simple jump check, only allows jumping if player is on the ground or coyote time
     {
         Jump();
         coyoteTimer=0;          //Resetting coyote timer
     }
-    
+    if(IsKeyReleased(KEY_W)&&velocity.y<0)
+    {
+        velocity.y*=0.6f;
+    }
+
     if (IsKeyDown(KEY_D)) {inputAxisX = 1; }
     
     else if (IsKeyDown(KEY_A)) inputAxisX = -1;
@@ -121,6 +124,7 @@ void Player::Jump()
 {
     velocity.y = -sqrt(2 * gravity * jumpHeight); // Jump velocity calculated using physics formula for jump height
 }
+
 
 void Player::ApplyGravity(float dt)     // This function applies gravity to the player, affecting the vertical velocity and position
 {
