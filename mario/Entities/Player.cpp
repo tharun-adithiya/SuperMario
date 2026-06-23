@@ -24,15 +24,16 @@ void Player::Update(float dt)
 
     ApplyGravity(dt);
     
-    if(wasGrounded&&!isGrounded)
+    if(wasGrounded&&!isGrounded&&velocity.y>=0)
     {
         coyoteTimer=coyoteTime;
     }
-
     if(!isGrounded)
     { 
         coyoteTimer-=dt;
     }
+    //if(bufferTimer>0) bufferTimer-=dt;
+
     wasGrounded=isGrounded;
 
     velocity.x = inputAxisX * speed; 
@@ -95,14 +96,25 @@ void Player::Update(float dt)
 }
 void Player::HandleInput(float dt)
 {
-    if((IsKeyPressed(KEY_W)||IsKeyPressed(KEY_SPACE))&& (isGrounded || coyoteTimer>0)) // Simple jump check, only allows jumping if player is on the ground or coyote time
+    if(IsKeyPressed(KEY_W) || IsKeyPressed(KEY_SPACE))
+    {
+        JumpbufferTimer = JumpbufferTime;
+    }
+
+    // Updates timers
+    JumpbufferTimer -= dt;
+    
+    if(JumpbufferTimer > 0 &&
+    (isGrounded || coyoteTimer > 0))
     {
         Jump();
-        coyoteTimer=0;          //Resetting coyote timer
+
+        JumpbufferTimer = 0;
+        coyoteTimer = 0;
     }
-    if(IsKeyReleased(KEY_W)&&velocity.y<0)
+    if(IsKeyReleased(KEY_W)&&velocity.y<0)          //Variable jump height
     {
-        velocity.y*=0.6f;
+        velocity.y*=0.52f;
     }
 
     if (IsKeyDown(KEY_D)) {inputAxisX = 1; }

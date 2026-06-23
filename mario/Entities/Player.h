@@ -22,13 +22,20 @@ class Player
         //Movement properties
         bool isGrounded=false;
         bool wasGrounded=false;
+
         float gravity = 9.81*35;
         float maxFallSpeed = 1000;
+
         float speed=100;
+
         float coyoteTime=0.2;
-        float jumpHeight=57;
-        float rateOfJump=0.0;
         float coyoteTimer=0;
+
+        float JumpbufferTime=0.15;
+        float JumpbufferTimer=0;
+
+        float jumpHeight=57;
+
         int inputAxisX=0;
 
 
