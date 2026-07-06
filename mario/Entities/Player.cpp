@@ -13,8 +13,8 @@ Player::Player()
     playerCenter = Vector2D(position.x + width/2, position.y + height/2);
     velocity = Vector2D(0, 0);
     width = 50;
-    height = 100;
-    collider= MyRect(Vector2D(width,height),position,velocity);
+    height = 50;
+    collider= boxCollider2D(Vector2D(width,height),position,velocity);
 }
 
 void Player::Update(float dt)
@@ -32,21 +32,28 @@ void Player::Update(float dt)
     { 
         coyoteTimer-=dt;
     }
-    //if(bufferTimer>0) bufferTimer-=dt;
 
     wasGrounded=isGrounded;
 
-    velocity.x = inputAxisX * speed; 
+    velocity.x = inputAxisX * maxSpeed*builtUpSpeed; 
     collider.velocity = velocity;
     isGrounded = false;
     debugHits.clear();
 
+    PerformCollisionCheckAgainstTiles(dt);
+    PerformCollisionCheckAgainstTriggers(dt);
+    position += velocity * dt;
+    collider.position = position;
+}
+
+void Player::PerformCollisionCheckAgainstTiles(float dt)
+{
     // Calculate the swept area for debugging
     float minX = std::min(collider.position.x, collider.position.x + velocity.x * dt);
     float minY = std::min(collider.position.y, collider.position.y + velocity.y * dt);
     float maxX = std::max(collider.position.x + collider.size.x, collider.position.x + collider.size.x + velocity.x * dt);
     float maxY = std::max(collider.position.y + collider.size.y, collider.position.y + collider.size.y + velocity.y * dt);
-    debugSweptArea = MyRect(Vector2D(maxX - minX, maxY - minY), Vector2D(minX, minY));
+    debugSweptArea = boxCollider2D(Vector2D(maxX - minX, maxY - minY), Vector2D(minX, minY));
 
     // Get only the tiles near the player's movement path
     vector<Tile> solidTiles = Game::tilemap.GetNearbySolidTiles(collider, velocity, dt);
@@ -90,10 +97,22 @@ void Player::Update(float dt)
         // This ensures that the player don't hit the internal cracks of the tiles
         collider.velocity = velocity;
     }
-    
-    position += velocity * dt;
-    collider.position = position;
 }
+
+void Player :: PerformCollisionCheckAgainstTriggers(float dt)
+{
+    for(auto& coin : Game::tilemap.GetAllCoins())
+    {
+        if(coin.isCollected) continue;
+
+        CollisionInfo info = AABB::DynamicRectVsRect(collider, coin.triggerCollider, dt);
+        if(info.hit) {
+            cout<<"Coin is hit\n";
+            coin.DisableCoin();
+        }
+    }
+}
+
 void Player::HandleInput(float dt)
 {
     if(IsKeyPressed(KEY_W) || IsKeyPressed(KEY_SPACE))
@@ -117,24 +136,44 @@ void Player::HandleInput(float dt)
         velocity.y*=0.52f;
     }
 
-    if (IsKeyDown(KEY_D)) {inputAxisX = 1; }
+    if (IsKeyDown(KEY_D)) {
+        inputAxisX = 1; 
+        if(builtUpSpeed>1)
+        {
+            builtUpSpeed=1;
+        }
+        builtUpSpeed+=dt*rateofBuiltUpSpeed;
+        //cout<<"BuiltUp speed:"<<builtUpSpeed;
+    }
     
-    else if (IsKeyDown(KEY_A)) inputAxisX = -1;
+    else if (IsKeyDown(KEY_A)) {
+        inputAxisX = -1;
+        if(builtUpSpeed>1)
+        {
+            builtUpSpeed=1;
+        }
+        builtUpSpeed+=dt*rateofBuiltUpSpeed;
+        //cout<<"BuiltUp speed:"<<builtUpSpeed;
+    }
 
-    else inputAxisX = 0;
+    else{
+        inputAxisX=0;
+        builtUpSpeed=0;
+    }
 }
 
 
-void Player::Move(float dt)               // This function updates the player's position based on the input axis and speed, allowing for horizontal movement
+void Player::Move(float dt)               // This function updates the player's position based on the input axis and speed, allowing for horizontal movement. This function is not being used now.
 {
-    velocity.x = inputAxisX * speed;
-    position += velocity * dt;
-    
+    velocity.x = inputAxisX * maxSpeed*builtUpSpeed;
+    cout<<"Current Velocity: "<<velocity.x;
+    position += velocity;
 }
 
 void Player::Jump()
 {
     velocity.y = -sqrt(2 * gravity * jumpHeight); // Jump velocity calculated using physics formula for jump height
+    
 }
 
 
@@ -146,13 +185,13 @@ void Player::ApplyGravity(float dt)     // This function applies gravity to the 
 
 void Player::Render()
 {
-    DrawRectangle(position.x, position.y, width, height, RED);
+    DrawRectangleV((Vector2){position.x, position.y}, (Vector2){(float)width, (float)height}, RED);
     
     // Draw collision normal visualizers on top of the player
     for(const auto& hit : debugHits)
     {
         Vector2D endPoint = hit.contactPoint + hit.contactNormal * 30.0f; 
-        DrawCircle(hit.contactPoint.x, hit.contactPoint.y, 10, YELLOW);
+        DrawCircleV((Vector2){hit.contactPoint.x, hit.contactPoint.y}, 10.0f, YELLOW);
         DrawLineEx(Vector2{hit.contactPoint.x, hit.contactPoint.y}, Vector2{endPoint.x, endPoint.y}, 3.0f, GREEN);
     }
 }

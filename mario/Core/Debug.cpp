@@ -14,25 +14,39 @@ void Debug::DrawDebugPosition(const Vector2D& position)
     int y= padding;
     DrawText(text, x, y, fontSize, WHITE);
 }
-
-void Debug::DrawPlayerHitBox(int posX, int posY, int length, int width)
+void Debug::DrawFPS()
 {
-    DrawRectangleLines(posX, posY, width, length, GREEN);
+    const int fontSize = 20;
+    const int padding = 40;
+    const char* text= TextFormat("FPS:(%d)", GetFPS());
+
+    int textWidth = MeasureText(text, fontSize);
+
+    int x= GetScreenWidth() - textWidth - padding;
+    int y= padding;
+    DrawText(text, x, y, fontSize, WHITE);
+}
+void Debug::DrawPlayerHitBox(float posX, float posY, float length, float width)
+{
+    DrawRectangleLinesEx((Rectangle){posX, posY, width, length}, 1.0f, GREEN);
 }
 
-void Debug:: DrawWorldGrid(int tileSize, int screenWidth, int screenHeight)
+void Debug:: DrawWorldGrid(int tileSize, int cols, int rows)
 {
-    for (int x = 0; x < screenWidth; x += tileSize)
+    float worldWidth = cols * tileSize;
+    float worldHeight = rows * tileSize;
+    
+    for (int x = 0; x <= cols; x++)
     {
-        DrawLine(x, 0, x, screenHeight, GRAY);
+        DrawLineV((Vector2){(float)(x * tileSize), 0.0f}, (Vector2){(float)(x * tileSize), worldHeight}, GRAY);
     }
-    for (int y = 0; y < screenHeight; y += tileSize)
+    for (int y = 0; y <= rows; y++)
     {
-        DrawLine(0, y, screenWidth, y, GRAY);
+        DrawLineV((Vector2){0.0f, (float)(y * tileSize)}, (Vector2){worldWidth, (float)(y * tileSize)}, GRAY);
     }
 }
 
-void Debug::DrawSweptArea(const MyRect& sweptArea)
+void Debug::DrawSweptArea(const boxCollider2D& sweptArea)
 {
-    DrawRectangleLines(sweptArea.position.x, sweptArea.position.y, sweptArea.size.x, sweptArea.size.y, ORANGE);
+    DrawRectangleLinesEx((Rectangle){sweptArea.position.x, sweptArea.position.y, sweptArea.size.x, sweptArea.size.y}, 1.0f, ORANGE);
 }

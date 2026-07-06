@@ -11,9 +11,9 @@ class Player
         Vector2D playerCenter;
 
         //Collision properties
-        MyRect collider;
+        boxCollider2D collider;
         std::vector<CollisionInfo> debugHits;
-        MyRect debugSweptArea;
+        boxCollider2D debugSweptArea;
 
         //Size properties
         float height;
@@ -26,7 +26,9 @@ class Player
         float gravity = 9.81*35;
         float maxFallSpeed = 1000;
 
-        float speed=100;
+        float maxSpeed=200;
+        float builtUpSpeed=0;
+        float rateofBuiltUpSpeed=5;
 
         float coyoteTime=0.2;
         float coyoteTimer=0;
@@ -43,6 +45,8 @@ class Player
         
         Player();
         void Update(float dt);
+        void PerformCollisionCheckAgainstTiles(float dt);
+        void PerformCollisionCheckAgainstTriggers(float dt);
         void HandleInput(float dt);
         void Render();
         void Move(float dt);
@@ -55,5 +59,5 @@ class Player
         int getHitboxWidth() const {return  collider.size.x;}
         Vector2D getVelocity() {return velocity;}
         void setVelocity(Vector2D velocity) {this->velocity=velocity;}
-        MyRect GetDebugSweptArea() const { return debugSweptArea; }
+        boxCollider2D GetDebugSweptArea() const { return debugSweptArea; }
 };

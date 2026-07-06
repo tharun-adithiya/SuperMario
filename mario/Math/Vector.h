@@ -22,6 +22,8 @@ struct Vector2D
         cout << "Vector2D(%.2f, %.2f)\n" << x << ", " << y << ")\n";
     }
 
+    bool operator==(const Vector2D&) const = default;
+
     Vector2D& operator+=(const Vector2D& other)
     {
         x += other.x;

@@ -7,7 +7,8 @@ class Game
 {
     private:
         Player player;
-        
+        bool isDebugOn;
+        Camera2D camera;
     public:
         static Tilemap tilemap;
         void Init();
@@ -16,4 +17,4 @@ class Game
         void Shutdown();
         
 };
-
+

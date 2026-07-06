@@ -6,7 +6,8 @@ namespace Debug
 {
     void DrawDebugInfo(const Vector2D& position, const Vector2D& velocity);
     void DrawDebugPosition(const Vector2D& position);
-    void DrawPlayerHitBox(int posX, int posY,int length, int width);
-    void DrawWorldGrid(int tileSize, int screenWidth, int screenHeight);
-    void DrawSweptArea(const MyRect& sweptArea);
+    void DrawPlayerHitBox(float posX, float posY, float length, float width);
+    void DrawWorldGrid(int tileSize, int cols, int rows);
+    void DrawSweptArea(const boxCollider2D& sweptArea);
+    void DrawFPS();
 }

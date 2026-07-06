@@ -1,17 +1,25 @@
 #pragma once
 #include "Vector.h"
-struct MyRect
+struct boxCollider2D
 {
     Vector2D size;
     Vector2D position;
     Vector2D velocity;
-
-    MyRect()
+    bool isTrigger=false;
+    boxCollider2D()
     {}
-    MyRect(Vector2D size, Vector2D position, Vector2D velocity) : size(size), position(position), velocity(velocity)
+    /// @brief Takes the size, position and velocity of the box collider
+    /// @param size 
+    /// @param position 
+    /// @param velocity 
+    boxCollider2D(Vector2D size, Vector2D position, Vector2D velocity) : size(size), position(position), velocity(velocity)
     {}
-    MyRect(Vector2D size, Vector2D position) : size(size), position(position){}
+    /// @brief Takes the size and position of the boxCollider
+    /// @param size 
+    /// @param position 
+    boxCollider2D(Vector2D size, Vector2D position) : size(size), position(position){}
 
+    bool operator==(const boxCollider2D&) const = default;
 };
 
 struct CollisionInfo
@@ -40,7 +48,7 @@ struct AABB
 {
 
 
-    static bool RayVsRect(const Vector2D &rayOrigin , const Vector2D & velocityVec, const MyRect & stationaryTarget, float & time_hit_near, Vector2D &contact_point, Vector2D & contact_normal)
+    static bool RayVsRect(const Vector2D &rayOrigin , const Vector2D & velocityVec, const boxCollider2D & stationaryTarget, float & time_hit_near, Vector2D &contact_point, Vector2D & contact_normal)
     {
         contact_normal= {0,0};
         contact_point = {0,0};
@@ -89,18 +97,18 @@ struct AABB
         return true;
     }
 
-    static CollisionInfo DynamicRectVsRect(const MyRect &movingRect ,const MyRect & stationaryTarget,float &elapsedTime)
+    static CollisionInfo DynamicRectVsRect(const boxCollider2D &movingRect ,const boxCollider2D & stationaryTarget,float &elapsedTime)
     {
 
         CollisionInfo thisCollisionInfo= CollisionInfo();
 
         if(movingRect.velocity.x==0&&movingRect.velocity.y==0) return thisCollisionInfo;
 
-        MyRect expandedtargetRect;
+        boxCollider2D expandedtargetRect;
 
         expandedtargetRect.position= stationaryTarget.position-movingRect.size/2;
         expandedtargetRect.size= stationaryTarget.size+movingRect.size;
-
+        
         if(RayVsRect(
             movingRect.position+movingRect.size/2,
             movingRect.velocity*elapsedTime,

@@ -9,26 +9,50 @@ Tilemap Game::tilemap;
 void Game::Init()
 {
     InitWindow(800, 600, "Mario");
-    tilemap=Tilemap(16, 12, 50); // Initialize tilemap with width, height, and tile size
+    tilemap=Tilemap(100, 50, 50); // Initialize tilemap with width, height, and tile size
     tilemap.Load(); // Load tile data
     SetTargetFPS(60);
+
+    camera = { 0 };
+    camera.target = (Vector2){ player.GetPosition().x, player.GetPosition().y };
+    camera.offset = (Vector2){ 800.0f / 2.0f, 600.0f / 2.0f };
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
 }
 
 void Game::Update(float dt)
 {
+    tilemap.Update(dt);
     player.Update(dt);
+    camera.target = (Vector2){ player.GetPosition().x, player.GetPosition().y };
+
+    if(IsKeyPressed(KEY_T)&&!isDebugOn) isDebugOn=true;
+    else if (IsKeyPressed(KEY_T)&& isDebugOn) isDebugOn=false;
+
 }
 
 void Game::Render()
 {
     BeginDrawing();
     ClearBackground(BLUE);
+    
+    BeginMode2D(camera);
     player.Render();
     tilemap.Render();
-    Debug::DrawWorldGrid(tilemap.GetTileSize(), GetScreenWidth(), GetScreenHeight());
-    Debug::DrawDebugPosition(player.GetPosition());
-    Debug::DrawPlayerHitBox(player.GetPosition().x, player.GetPosition().y, player.getHitboxHeight(),player.getHitboxWidth());
-    Debug::DrawSweptArea(player.GetDebugSweptArea());
+    if(isDebugOn)
+    {
+        Debug::DrawWorldGrid(tilemap.GetTileSize(), tilemap.GetWidth(), tilemap.GetHeight());
+        Debug::DrawPlayerHitBox(player.GetPosition().x, player.GetPosition().y, player.getHitboxHeight(),player.getHitboxWidth());
+        Debug::DrawSweptArea(player.GetDebugSweptArea());
+    }
+    EndMode2D();
+
+    if(isDebugOn)
+    {
+        Debug::DrawDebugPosition(player.GetPosition());
+        Debug::DrawFPS();
+    }
+    
     EndDrawing();
 }
 

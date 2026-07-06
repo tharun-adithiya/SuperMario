@@ -1,6 +1,9 @@
 #include "Tilemap.h"
 #include "raylib.h"
+#include <memory>
 #include <iostream>
+#include <fstream>
+#include "Entities/Block.h"
 using namespace std;
 Tilemap::Tilemap(int width, int height, int tileSize)
 {
@@ -9,38 +12,51 @@ Tilemap::Tilemap(int width, int height, int tileSize)
     this->tileSize = tileSize;
 
     grid.resize(height, vector<int>(width, 0)); // Initialize grid with default tile type (0)
-    grid2.resize(height, vector<Tile>(width, Tile())); // Initialize grid2 to fix exception
+    tileGrid.resize(height, vector<Tile>(width, Tile())); // Initialize grid2 to fix exception
+    
 }
 
 void Tilemap::Load()
 {
-    // Loading tile data here. For now, it is hardcoded for simplicity.
+    vector<string> levelString;
+    
+    std::ifstream levelFile("mario/World/MarioLevel.txt");
+    string line;
+    while(std::getline(levelFile,line))
+    {
+        levelString.push_back(line);
+    }
 
-    for(int x=0;x<width;x++)
+    // Loading tile data here. For now, it is hardcoded for simplicity.
+    coins.push_back(Coin(8.0f,Vector2D(200,450)));
+    coins.push_back(Coin(8.0f,Vector2D(250,450)));
+    /*for(int x=0;x<width;x++)
     {
         if(x==width-1) break;
         //grid[height-1][x] = TileType::Ground; // Set bottom row to ground
         Vector2D tilePos = Vector2D(x * tileSize, (height - 2) * tileSize);
-        grid2[height - 2][x] = Tile(MyRect(Vector2D(tileSize, tileSize), tilePos), TileType::Ground);
+        tileGrid[height - 2][x] = Tile(boxCollider2D(Vector2D(tileSize, tileSize), tilePos), TileType::Ground);
         //grid2[height-1][x] = Tile(MyRect(Vector2D(tileSize,tileSize),Vector2D(0,0)),TileType::Ground); // Set bottom row to ground
-    }
-    for(int x=4;x<8;x++)
+
+    }*/
+    for(int y=0; y < height && y < levelString.size(); y++)
     {
-        Vector2D tilePos = Vector2D(x * tileSize, (height - 3) * tileSize);
-        grid2[height-3][x]=Tile(MyRect(Vector2D(tileSize, tileSize), tilePos), TileType::Ground);
-    }
-    for(int y=3;y<7;y++)
-    {
-        Vector2D tilePos = Vector2D(10 * tileSize, (height - y) * tileSize);
-        grid2[height-y][10]=Tile(MyRect(Vector2D(tileSize, tileSize), tilePos), TileType::Ground);
+        for(int x=0; x < width && x < levelString[y].size(); x++)
+        {
+            if(levelString[y][x]=='1')
+            {
+                Vector2D tilePos = Vector2D(x * tileSize, y * tileSize);
+                tileGrid[y][x]=Tile(boxCollider2D(Vector2D(tileSize, tileSize), tilePos), TileType::Ground);
+            }
+            else if(levelString[y][x]=='2')
+            {
+                Vector2D blockPos = Vector2D(x * tileSize, y * tileSize);
+                Vector2D blockSize= Vector2D(tileSize,tileSize);
+                interactiveBlocks.push_back(std::make_unique<BreakableBlock>(blockPos,blockSize));
+            }
+        }
     }
     
-    grid2[height-5][9]=Tile(MyRect(Vector2D(tileSize, tileSize), Vector2D(9*tileSize,(height-5)*tileSize)),TileType::Ground);
-    grid2[height-4][9]=Tile(MyRect(Vector2D(tileSize, tileSize), Vector2D(9*tileSize,(height-5)*tileSize)),TileType::Ground);
-    grid2[height-3][9]=Tile(MyRect(Vector2D(tileSize, tileSize), Vector2D(9*tileSize,(height-3)*tileSize)),TileType::Ground);
-    grid2[height-4][8]=Tile(MyRect(Vector2D(tileSize, tileSize), Vector2D(8*tileSize,(height-4)*tileSize)),TileType::Ground);
-    grid2[height-3][8]=Tile(MyRect(Vector2D(tileSize, tileSize), Vector2D(8*tileSize,(height-3)*tileSize)),TileType::Ground);
-    grid2[height-2][8]=Tile(MyRect(Vector2D(tileSize, tileSize), Vector2D(8*tileSize,(height-2)*tileSize)),TileType::Ground);
     
 
 
@@ -48,23 +64,45 @@ void Tilemap::Load()
 
 void Tilemap::Render()
 {
+    
     for(int y=0;y<height;y++)
     {
         for(int x=0;x<width;x++)
         {
             // int tileType = grid[y][x]; // Unused
-            Tile tile=grid2[y][x];
+            Tile tile=tileGrid[y][x];
             /*if(tileType == TileType::Ground) // Ground tile
             {
                 DrawRectangle(x * tileSize, y * tileSize, tileSize, tileSize, DARKGREEN);
             }*/
             if(tile.tileType == TileType::Ground) // Ground tile
             {
-                DrawRectangle(x * tile.collider.size.x, y * tile.collider.size.y, tileSize, tileSize, BLACK);
+                DrawRectangleV((Vector2){x * tile.collider.size.x, y * tile.collider.size.y}, (Vector2){(float)tileSize, (float)tileSize}, BLACK);
             }
+
         }
     }
+    //Renders Interactible block
+    for(auto& block : interactiveBlocks)
+    {
+        block->Render();
+    }
+    //RenderCoins
+    for(size_t i=0;i<coins.size();i++)
+    {
+        if (coins[i].isCollected) continue;
+        DrawCircleV((Vector2){coins[i].position.x, coins[i].position.y}, coins[i].radius, YELLOW);
+        DrawRectangleLinesEx((Rectangle){coins[i].triggerCollider.position.x, coins[i].triggerCollider.position.y, coins[i].triggerCollider.size.x, coins[i].triggerCollider.size.y}, 1.0f, GREEN);  //Collider bounds
+    }
 }
+void Tilemap::Update(float dt)
+{
+    for(auto& block : interactiveBlocks)
+    {
+        block->Update(dt);
+    }
+}
+
 
 int Tilemap::GetTile(int x, int y) const
 {
@@ -78,7 +116,7 @@ Tile Tilemap::GetActualTile(int x,int y) const
 {
     if(x < 0 || x >= width || y < 0 || y >= height)
         return Tile(); // Out of bounds
-    return grid2[y][x];
+    return tileGrid[y][x];
 }
 
 vector<Tile> Tilemap::GetSolidTiles()
@@ -88,9 +126,9 @@ vector<Tile> Tilemap::GetSolidTiles()
     {
         for(int x=0;x<width;x++)
         {
-            if(grid2[y][x].tileType==TileType::Ground) 
+            if(tileGrid[y][x].tileType==TileType::Ground) 
             {
-                solidTiles.push_back(grid2[y][x]);
+                solidTiles.push_back(tileGrid[y][x]);
                 //std::cout<<"Added Tile indices:"<<y<<" "<<x;   
             }
         }
@@ -98,7 +136,7 @@ vector<Tile> Tilemap::GetSolidTiles()
     return solidTiles;
 }
 
-vector<Tile> Tilemap::GetNearbySolidTiles(const MyRect& bounds, Vector2D velocity, float dt)
+vector<Tile> Tilemap::GetNearbySolidTiles(const boxCollider2D& bounds, Vector2D velocity, float dt)
 {
     vector<Tile> solidTiles;
     
@@ -119,12 +157,17 @@ vector<Tile> Tilemap::GetNearbySolidTiles(const MyRect& bounds, Vector2D velocit
     {
         for(int x = startX; x <= endX; x++)
         {
-            if(grid2[y][x].tileType == TileType::Ground) 
+            if(tileGrid[y][x].tileType == TileType::Ground) 
             {
-                solidTiles.push_back(grid2[y][x]);
+                solidTiles.push_back(tileGrid[y][x]);
             }
         }
     }
     
     return solidTiles;
+}
+
+vector<Coin>& Tilemap:: GetAllCoins()
+{
+    return coins;
 }
