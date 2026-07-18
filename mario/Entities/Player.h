@@ -9,7 +9,7 @@ class Player
         Vector2D position;
         Vector2D velocity;
         Vector2D playerCenter;
-
+        
         //Collision properties
         boxCollider2D collider;
         std::vector<CollisionInfo> debugHits;
@@ -44,9 +44,12 @@ class Player
     public:
         
         Player();
+        void ResetPlayer();
         void Update(float dt);
         void PerformCollisionCheckAgainstTiles(float dt);
         void PerformCollisionCheckAgainstTriggers(float dt);
+        void PerformCollisionCheckAgainstBlocks(float dt);
+        void PerformCollisionCheckAgainstLevelEnd(float dt);
         void HandleInput(float dt);
         void Render();
         void Move(float dt);

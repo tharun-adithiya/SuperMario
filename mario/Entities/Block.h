@@ -13,11 +13,16 @@ enum class BlockType
 class Block
 {   
     protected:
+       
+        
+        
+    public:
         Vector2D position;
         Vector2D size;
+        BlockType type;
         boxCollider2D collider;
-    public:
         Texture2D blockImage;
+        bool isBroken;
         Block(){}
         Block(Vector2D position, Vector2D size) : position (position) ,size(size)
         {}
@@ -30,10 +35,10 @@ class Block
 class BreakableBlock : public Block
 {
     public:
-        BlockType type= BlockType::BreakableBlock;
-        bool isBroken;
+        
         float startY;
         BreakableBlock(){
+            type= BlockType::BreakableBlock;
             position= Vector2D(0,0);
             size=Vector2D(0,0);
             isBroken=false;
@@ -41,6 +46,7 @@ class BreakableBlock : public Block
         }
         BreakableBlock(Vector2D position, Vector2D size) : Block(position,size)
         {
+            type= BlockType::BreakableBlock;
             isBroken=false;
             startY = position.y;
             collider = boxCollider2D(size,position);

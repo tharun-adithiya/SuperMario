@@ -6,14 +6,13 @@
 
 int main()
 {
-    Game game;
-    game.Init();
+    Game::Instance.Init();
     while(!WindowShouldClose())
     {
         float dt = GetFrameTime();
-        game.Update(dt);
-        game.Render();
+        Game::Instance.Update(dt);
+        Game::Instance.Render();
     }
-    game.Shutdown();
+    Game::Instance.Shutdown();
     return 0;
 } 

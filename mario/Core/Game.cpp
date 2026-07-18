@@ -5,14 +5,19 @@
 #include "Math/Vector.h"
 #include "Math/AABB.h"
 Tilemap Game::tilemap;
+int Game::coinsColected = 0;
+Game Game::Instance;
 
 void Game::Init()
 {
     InitWindow(800, 600, "Mario");
+
     tilemap=Tilemap(100, 50, 50); // Initialize tilemap with width, height, and tile size
     tilemap.Load(); // Load tile data
     SetTargetFPS(60);
-
+    ui=UI();
+    coinsColected=0;
+    
     camera = { 0 };
     camera.target = (Vector2){ player.GetPosition().x, player.GetPosition().y };
     camera.offset = (Vector2){ 800.0f / 2.0f, 600.0f / 2.0f };
@@ -44,8 +49,11 @@ void Game::Render()
         Debug::DrawWorldGrid(tilemap.GetTileSize(), tilemap.GetWidth(), tilemap.GetHeight());
         Debug::DrawPlayerHitBox(player.GetPosition().x, player.GetPosition().y, player.getHitboxHeight(),player.getHitboxWidth());
         Debug::DrawSweptArea(player.GetDebugSweptArea());
+        Debug::DrawLevelEndCollider(tilemap.GetLevelEndCollider());
     }
     EndMode2D();
+
+    ui.Render();
 
     if(isDebugOn)
     {
@@ -56,8 +64,22 @@ void Game::Render()
     EndDrawing();
 }
 
+void Game::Restart()
+{
+    player.ResetPlayer();
+    tilemap.ResetWorldItems();
+    coinsColected=0;
+    
+    camera = { 0 };
+    camera.target = (Vector2){ player.GetPosition().x, player.GetPosition().y };
+    camera.offset = (Vector2){ 800.0f / 2.0f, 600.0f / 2.0f };
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
+}
+
 void Game::Shutdown()
 {
     CloseWindow();
 }
+
 

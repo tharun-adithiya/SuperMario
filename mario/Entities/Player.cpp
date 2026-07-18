@@ -42,6 +42,8 @@ void Player::Update(float dt)
 
     PerformCollisionCheckAgainstTiles(dt);
     PerformCollisionCheckAgainstTriggers(dt);
+    PerformCollisionCheckAgainstBlocks(dt);
+    PerformCollisionCheckAgainstLevelEnd(dt);
     position += velocity * dt;
     collider.position = position;
 }
@@ -108,8 +110,59 @@ void Player :: PerformCollisionCheckAgainstTriggers(float dt)
         CollisionInfo info = AABB::DynamicRectVsRect(collider, coin.triggerCollider, dt);
         if(info.hit) {
             cout<<"Coin is hit\n";
+            Game::updateCoins();
+            cout<<"Current coins:"<<Game::GetCoins();
             coin.DisableCoin();
         }
+    }
+}
+
+void Player:: PerformCollisionCheckAgainstBlocks(float dt)
+{
+    for(auto& block : Game::tilemap.GetAllBlocks())
+    {
+        CollisionInfo info = AABB::DynamicRectVsRect(collider, block->collider, dt);
+        if(block->isBroken) continue;
+        if (info.contactNormal.y == -1)
+        {
+            isGrounded = true;
+        }
+        switch(block->type)
+        {
+            case BlockType::BreakableBlock:
+            {
+                //5cout<<"Checking breakable block";
+                
+                if(info.hit&&info.contactNormal==Vector2D{0,1})
+                {
+                    cout<<"Hit from below";
+                    CollisionResolver::Resolve(velocity,info);
+                    collider.velocity = velocity; // update collider velocity after resolution
+                    block->OnHitFromBelow();
+                }
+                else if(info.hit)
+                {
+                    CollisionResolver::Resolve(velocity,info);
+                    collider.velocity = velocity; // update collider velocity after resolution
+                }
+                
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
+    }
+}
+
+void Player::PerformCollisionCheckAgainstLevelEnd(float dt)
+{
+    CollisionInfo info= AABB::DynamicRectVsRect(collider,Game::tilemap.GetLevelEndCollider(),dt);
+    if(info.hit)
+    {
+        cout<<"Player hit level end";
+        Game::Instance.Restart();
     }
 }
 
@@ -131,12 +184,12 @@ void Player::HandleInput(float dt)
         JumpbufferTimer = 0;
         coyoteTimer = 0;
     }
-    if(IsKeyReleased(KEY_W)&&velocity.y<0)          //Variable jump height
+    if((IsKeyReleased(KEY_W)||IsKeyPressed(KEY_UP))&&velocity.y<0)          //Variable jump height
     {
         velocity.y*=0.52f;
     }
 
-    if (IsKeyDown(KEY_D)) {
+    if (IsKeyDown(KEY_D)||IsKeyDown(KEY_RIGHT)) {
         inputAxisX = 1; 
         if(builtUpSpeed>1)
         {
@@ -146,7 +199,7 @@ void Player::HandleInput(float dt)
         //cout<<"BuiltUp speed:"<<builtUpSpeed;
     }
     
-    else if (IsKeyDown(KEY_A)) {
+    else if (IsKeyDown(KEY_A)||IsKeyDown(KEY_LEFT)) {
         inputAxisX = -1;
         if(builtUpSpeed>1)
         {
@@ -194,4 +247,12 @@ void Player::Render()
         DrawCircleV((Vector2){hit.contactPoint.x, hit.contactPoint.y}, 10.0f, YELLOW);
         DrawLineEx(Vector2{hit.contactPoint.x, hit.contactPoint.y}, Vector2{endPoint.x, endPoint.y}, 3.0f, GREEN);
     }
+}
+
+void Player::ResetPlayer()
+{
+    position = Vector2D(100, 100);
+    playerCenter = Vector2D(position.x + width/2, position.y + height/2);
+    velocity = Vector2D(0, 0);
+    collider= boxCollider2D(Vector2D(width,height),position,velocity);
 }

@@ -29,7 +29,7 @@ struct CollisionInfo
     Vector2D contactNormal;
     Vector2D contactPoint;
 
-
+    
     CollisionInfo()
     {
         hit=false;

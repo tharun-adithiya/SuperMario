@@ -4,7 +4,7 @@
 void Debug::DrawDebugPosition(const Vector2D& position)
 {
     const int fontSize = 20;
-    const int padding = 10;
+    const int padding = 60;
 
     const char* text= TextFormat("Position: (%.2f, %.2f)", position.x, position.y);
 
@@ -29,6 +29,14 @@ void Debug::DrawFPS()
 void Debug::DrawPlayerHitBox(float posX, float posY, float length, float width)
 {
     DrawRectangleLinesEx((Rectangle){posX, posY, width, length}, 1.0f, GREEN);
+}
+
+void Debug::DrawLevelEndCollider(boxCollider2D collider)
+{
+    Vector2D pos= collider.position;
+    Vector2D size= collider.size;
+
+    DrawRectangleLinesEx((Rectangle){pos.x, pos.y, size.x, size.y}, 1.0f, GREEN);
 }
 
 void Debug:: DrawWorldGrid(int tileSize, int cols, int rows)

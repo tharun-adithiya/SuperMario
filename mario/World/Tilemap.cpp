@@ -26,10 +26,11 @@ void Tilemap::Load()
     {
         levelString.push_back(line);
     }
-
-    // Loading tile data here. For now, it is hardcoded for simplicity.
-    coins.push_back(Coin(8.0f,Vector2D(200,450)));
-    coins.push_back(Coin(8.0f,Vector2D(250,450)));
+    int lvlStringRowSize= levelString.size();
+    int lvlStringColSize= levelString[0].size();
+  
+    coins.push_back(Coin(8.0f,Vector2D(800,450)));
+    coins.push_back(Coin(8.0f,Vector2D(850,450)));
     /*for(int x=0;x<width;x++)
     {
         if(x==width-1) break;
@@ -56,10 +57,20 @@ void Tilemap::Load()
             }
         }
     }
-    
-    
 
+    end= LevelEndCollider(Vector2D(-1000,650),Vector2D(10000,tileSize));
+}
+void Tilemap::ResetWorldItems()
+{
+    for(auto& coin : coins)
+    {
+        coin.isCollected=false;
+    }
 
+    for(auto& interactableBlock : interactiveBlocks)
+    {
+        interactableBlock->isBroken=false;
+    }
 }
 
 void Tilemap::Render()
@@ -85,6 +96,7 @@ void Tilemap::Render()
     //Renders Interactible block
     for(auto& block : interactiveBlocks)
     {
+        if(block->isBroken) continue;
         block->Render();
     }
     //RenderCoins
@@ -94,6 +106,7 @@ void Tilemap::Render()
         DrawCircleV((Vector2){coins[i].position.x, coins[i].position.y}, coins[i].radius, YELLOW);
         DrawRectangleLinesEx((Rectangle){coins[i].triggerCollider.position.x, coins[i].triggerCollider.position.y, coins[i].triggerCollider.size.x, coins[i].triggerCollider.size.y}, 1.0f, GREEN);  //Collider bounds
     }
+
 }
 void Tilemap::Update(float dt)
 {
@@ -112,11 +125,18 @@ int Tilemap::GetTile(int x, int y) const
 }
 
 
+
 Tile Tilemap::GetActualTile(int x,int y) const
 {
     if(x < 0 || x >= width || y < 0 || y >= height)
         return Tile(); // Out of bounds
     return tileGrid[y][x];
+}
+GridPos Tilemap::WorldToGridCenter(Vector2D worldPos)
+{   
+    int x= worldPos.x/tileSize;
+    int y= worldPos.x/tileSize;
+    return GridPos{x,y};
 }
 
 vector<Tile> Tilemap::GetSolidTiles()
@@ -165,6 +185,11 @@ vector<Tile> Tilemap::GetNearbySolidTiles(const boxCollider2D& bounds, Vector2D 
     }
     
     return solidTiles;
+}
+
+vector<std::unique_ptr<Block>>& Tilemap::GetAllBlocks()
+{
+    return interactiveBlocks;
 }
 
 vector<Coin>& Tilemap:: GetAllCoins()
