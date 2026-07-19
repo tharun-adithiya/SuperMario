@@ -2,9 +2,13 @@
 #include <vector>
 #include "Math/Vector.h"
 #include "Math/AABB.h"
+#include "raylib.h"
 class Player
 {
     private:
+
+        Texture2D playerTexture;
+
         //Transform properties
         Vector2D position;
         Vector2D velocity;
@@ -12,6 +16,7 @@ class Player
         
         //Collision properties
         boxCollider2D collider;
+        float colliderPadding;
         std::vector<CollisionInfo> debugHits;
         boxCollider2D debugSweptArea;
 
@@ -39,11 +44,12 @@ class Player
         float jumpHeight=57;
 
         int inputAxisX=0;
-
+        int lastInputAxis=1;
 
     public:
         
         Player();
+        void Init();
         void ResetPlayer();
         void Update(float dt);
         void PerformCollisionCheckAgainstTiles(float dt);

@@ -19,15 +19,27 @@ Tilemap::Tilemap(int width, int height, int tileSize)
 void Tilemap::Load()
 {
     vector<string> levelString;
-    
+   
+    spriteSheet=LoadTexture("mario/Art/LevelSpriteSheet.png");
     std::ifstream levelFile("mario/World/MarioLevel.txt");
     string line;
     while(std::getline(levelFile,line))
     {
         levelString.push_back(line);
     }
-    int lvlStringRowSize= levelString.size();
-    int lvlStringColSize= levelString[0].size();
+    
+    // Update dimensions based on the file content
+    this->height = levelString.size();
+    this->width = 0;
+    for(const auto& r : levelString) {
+        if(r.size() > this->width) {
+            this->width = r.size();
+        }
+    }
+    
+    // Resize grids to match the new dimensions
+    grid.assign(this->height, vector<int>(this->width, 0));
+    tileGrid.assign(this->height, vector<Tile>(this->width, Tile()));
   
     coins.push_back(Coin(8.0f,Vector2D(800,450)));
     coins.push_back(Coin(8.0f,Vector2D(850,450)));
@@ -88,7 +100,12 @@ void Tilemap::Render()
             }*/
             if(tile.tileType == TileType::Ground) // Ground tile
             {
-                DrawRectangleV((Vector2){x * tile.collider.size.x, y * tile.collider.size.y}, (Vector2){(float)tileSize, (float)tileSize}, BLACK);
+                DrawTexturePro(spriteSheet,{0,0,16,16},
+                    {x * tile.collider.size.x, y * tile.collider.size.y,(float)tileSize,(float)tileSize},{0,0}
+                    ,0.0f
+                    ,WHITE
+                );
+                //DrawRectangleV((Vector2){x * tile.collider.size.x, y * tile.collider.size.y}, (Vector2){(float)tileSize, (float)tileSize}, BLACK);
             }
 
         }
@@ -97,13 +114,19 @@ void Tilemap::Render()
     for(auto& block : interactiveBlocks)
     {
         if(block->isBroken) continue;
-        block->Render();
+        block->Render(spriteSheet,{32,0,16,16});
     }
     //RenderCoins
     for(size_t i=0;i<coins.size();i++)
     {
         if (coins[i].isCollected) continue;
-        DrawCircleV((Vector2){coins[i].position.x, coins[i].position.y}, coins[i].radius, YELLOW);
+        //DrawCircleV((Vector2){coins[i].position.x, coins[i].position.y}, coins[i].radius, YELLOW);
+        DrawTexturePro(spriteSheet,{16,0,16,16},
+                    {coins[i].triggerCollider.position.x, coins[i].triggerCollider.position.y,coins[i].triggerCollider.size.x, coins[i].triggerCollider.size.y},
+                    {0,0}
+                    ,0.0f
+                    ,WHITE
+                );
         DrawRectangleLinesEx((Rectangle){coins[i].triggerCollider.position.x, coins[i].triggerCollider.position.y, coins[i].triggerCollider.size.x, coins[i].triggerCollider.size.y}, 1.0f, GREEN);  //Collider bounds
     }
 

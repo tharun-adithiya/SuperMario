@@ -11,7 +11,7 @@ Game Game::Instance;
 void Game::Init()
 {
     InitWindow(800, 600, "Mario");
-
+    player.Init(); 
     tilemap=Tilemap(100, 50, 50); // Initialize tilemap with width, height, and tile size
     tilemap.Load(); // Load tile data
     SetTargetFPS(60);
@@ -46,8 +46,8 @@ void Game::Render()
     tilemap.Render();
     if(isDebugOn)
     {
-        Debug::DrawWorldGrid(tilemap.GetTileSize(), tilemap.GetWidth(), tilemap.GetHeight());
-        Debug::DrawPlayerHitBox(player.GetPosition().x, player.GetPosition().y, player.getHitboxHeight(),player.getHitboxWidth());
+        //Debug::DrawWorldGrid(tilemap.GetTileSize(), tilemap.GetWidth(), tilemap.GetHeight());
+       // Debug::DrawPlayerHitBox(player.GetPosition().x, player.GetPosition().y, player.getHitboxHeight(),player.getHitboxWidth());
         Debug::DrawSweptArea(player.GetDebugSweptArea());
         Debug::DrawLevelEndCollider(tilemap.GetLevelEndCollider());
     }

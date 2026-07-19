@@ -5,7 +5,7 @@ void Block:: Update(float dt)
 
 }
 
-void Block:: Render()
+void Block:: Render(Texture2D texture,Rectangle texCoords)
 {
 
 }
@@ -22,9 +22,10 @@ void BreakableBlock:: Update(float dt)
     collider.position.y = position.y;*/
 }
 
-void BreakableBlock :: Render()
+void BreakableBlock :: Render(Texture2D texture,Rectangle texCoords)
 {
-    DrawRectangleV(Vector2{position.x,position.y},Vector2{size.x,size.y}, GREEN);
+    DrawTexturePro(texture,texCoords,{collider.position.x,collider.position.y,collider.size.x,collider.size.y},{0,0},0.0,WHITE);
+    //DrawRectangleV(Vector2{position.x,position.y},Vector2{size.x,size.y}, GREEN);
 }
 
 void BreakableBlock :: OnHitFromBelow()
@@ -40,7 +41,7 @@ void CoinBlock::Update(float dt)
 {
 }
 
-void CoinBlock::Render()
+void CoinBlock::Render(Texture2D texture,Rectangle texCoords)
 {
 }
 

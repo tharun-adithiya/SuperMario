@@ -77,6 +77,8 @@ class Tilemap
     int width;
     int height;
     int tileSize;
+    
+    Texture2D spriteSheet;
     LevelEndCollider end;
     std::vector<std::unique_ptr<Block>> interactiveBlocks;
     vector<vector<int>> grid; // 2D vector to hold tile data

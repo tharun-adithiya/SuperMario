@@ -1,6 +1,5 @@
 #include "Entities/Player.h"
 #include <algorithm>
-#include <raylib.h>
 #include "Math/Vector.h"
 #include "Player.h"
 #include "World/Tilemap.h"
@@ -10,11 +9,30 @@ using namespace std;
 Player::Player()
 {
     position = Vector2D(100, 100);
-    playerCenter = Vector2D(position.x + width/2, position.y + height/2);
-    velocity = Vector2D(0, 0);
     width = 50;
     height = 50;
-    collider= boxCollider2D(Vector2D(width,height),position,velocity);
+    playerCenter = Vector2D(position.x + width/2, position.y + height/2);
+    velocity = Vector2D(0, 0);
+    
+    colliderPadding=8;
+
+    collider= boxCollider2D(Vector2D(width-2*colliderPadding,height),Vector2D(position.x+colliderPadding,position.y),velocity);
+}
+
+void Player::Init()
+{
+    try{
+        string playerTexturePath="mario/Art/Mario_Small_Idle.png";
+
+        if(!FileExists(playerTexturePath.c_str()))  throw runtime_error("Failed to get file at "+ playerTexturePath);
+        else cout<<"Player texture is found";
+
+        playerTexture=LoadTexture(playerTexturePath.c_str());
+    }
+    catch(const runtime_error& e)
+    {   
+        cout<<e.what()<<endl;
+    }
 }
 
 void Player::Update(float dt)
@@ -40,12 +58,13 @@ void Player::Update(float dt)
     isGrounded = false;
     debugHits.clear();
 
-    PerformCollisionCheckAgainstTiles(dt);
+    PerformCollisionCheckAgainstTiles(dt);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
     PerformCollisionCheckAgainstTriggers(dt);
     PerformCollisionCheckAgainstBlocks(dt);
     PerformCollisionCheckAgainstLevelEnd(dt);
     position += velocity * dt;
-    collider.position = position;
+    // Center the collider horizontally based on how much smaller it is than the visual width
+    collider.position = Vector2D(position.x + (width - collider.size.x) / 2.0f, position.y);
 }
 
 void Player::PerformCollisionCheckAgainstTiles(float dt)
@@ -191,6 +210,7 @@ void Player::HandleInput(float dt)
 
     if (IsKeyDown(KEY_D)||IsKeyDown(KEY_RIGHT)) {
         inputAxisX = 1; 
+        lastInputAxis=inputAxisX;
         if(builtUpSpeed>1)
         {
             builtUpSpeed=1;
@@ -201,6 +221,7 @@ void Player::HandleInput(float dt)
     
     else if (IsKeyDown(KEY_A)||IsKeyDown(KEY_LEFT)) {
         inputAxisX = -1;
+        lastInputAxis=inputAxisX;
         if(builtUpSpeed>1)
         {
             builtUpSpeed=1;
@@ -238,15 +259,16 @@ void Player::ApplyGravity(float dt)     // This function applies gravity to the 
 
 void Player::Render()
 {
-    DrawRectangleV((Vector2){position.x, position.y}, (Vector2){(float)width, (float)height}, RED);
+    //DrawRectangleV((Vector2){position.x, position.y}, (Vector2){(float)width, (float)height}, RED);
     
-    // Draw collision normal visualizers on top of the player
-    for(const auto& hit : debugHits)
+    DrawTexturePro(playerTexture, {0, 0, lastInputAxis*(float)playerTexture.width, (float)playerTexture.height}, {position.x, position.y, (float)width, (float)height}, {0, 0}, 0.0f, WHITE);
+   
+    /*for(const auto& hit : debugHits)                  Debug to check collision normal and hit status with tiles.
     {
         Vector2D endPoint = hit.contactPoint + hit.contactNormal * 30.0f; 
         DrawCircleV((Vector2){hit.contactPoint.x, hit.contactPoint.y}, 10.0f, YELLOW);
         DrawLineEx(Vector2{hit.contactPoint.x, hit.contactPoint.y}, Vector2{endPoint.x, endPoint.y}, 3.0f, GREEN);
-    }
+    }*/
 }
 
 void Player::ResetPlayer()
@@ -254,5 +276,6 @@ void Player::ResetPlayer()
     position = Vector2D(100, 100);
     playerCenter = Vector2D(position.x + width/2, position.y + height/2);
     velocity = Vector2D(0, 0);
-    collider= boxCollider2D(Vector2D(width,height),position,velocity);
+    colliderPadding=8;
+    collider= boxCollider2D(Vector2D(width-2*colliderPadding,height),Vector2D(position.x+colliderPadding,position.y),velocity);
 }

@@ -5,6 +5,7 @@ struct boxCollider2D
     Vector2D size;
     Vector2D position;
     Vector2D velocity;
+    Vector2D offset;
     bool isTrigger=false;
     boxCollider2D()
     {}
@@ -13,11 +14,13 @@ struct boxCollider2D
     /// @param position 
     /// @param velocity 
     boxCollider2D(Vector2D size, Vector2D position, Vector2D velocity) : size(size), position(position), velocity(velocity)
-    {}
+    {
+        offset={0,0};
+    }
     /// @brief Takes the size and position of the boxCollider
     /// @param size 
     /// @param position 
-    boxCollider2D(Vector2D size, Vector2D position) : size(size), position(position){}
+    boxCollider2D(Vector2D size, Vector2D position) : size(size), position(position){ offset={0,0};}
 
     bool operator==(const boxCollider2D&) const = default;
 };

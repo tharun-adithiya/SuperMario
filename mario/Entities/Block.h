@@ -15,7 +15,6 @@ class Block
     protected:
        
         
-        
     public:
         Vector2D position;
         Vector2D size;
@@ -29,7 +28,7 @@ class Block
         virtual ~Block() = default;
         virtual void OnHitFromBelow();
         virtual void Update(float dt);
-        virtual void Render();
+        virtual void Render(Texture2D texture,Rectangle texCoords);
 };
 
 class BreakableBlock : public Block
@@ -49,10 +48,11 @@ class BreakableBlock : public Block
             type= BlockType::BreakableBlock;
             isBroken=false;
             startY = position.y;
+            //Vector2D colliderSize(size.x/2,size.y); Experimental: To prevent breaking two adjacent tiles with a single jump
             collider = boxCollider2D(size,position);
         }
         void Update(float dt) override;
-        void Render() override;
+        void Render(Texture2D texture,Rectangle texCoords) override;
         void OnHitFromBelow() override;   
 };
 
@@ -63,7 +63,7 @@ class CoinBlock : public Block
         int numberOfCoins;
         Texture2D imageAfterBroke;                                                                                                                                                                                  
         void Update(float dt) override;
-        void Render() override;
+        void Render(Texture2D texture,Rectangle texCoords) override;
         void OnHitFromBelow() override;
         
 };
