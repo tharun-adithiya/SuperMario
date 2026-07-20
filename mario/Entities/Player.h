@@ -2,12 +2,17 @@
 #include <vector>
 #include "Math/Vector.h"
 #include "Math/AABB.h"
+#include "Graphics/Animation.h"
 #include "raylib.h"
 class Player
 {
     private:
 
         Texture2D playerTexture;
+
+        Animation runAnimation;
+        Animation idle;
+        Animation jump;
 
         //Transform properties
         Vector2D position;
@@ -31,7 +36,7 @@ class Player
         float gravity = 9.81*35;
         float maxFallSpeed = 1000;
 
-        float maxSpeed=200;
+        float maxSpeed=300;
         float builtUpSpeed=0;
         float rateofBuiltUpSpeed=5;
 

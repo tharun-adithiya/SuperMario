@@ -17,17 +17,21 @@ Player::Player()
     colliderPadding=8;
 
     collider= boxCollider2D(Vector2D(width-2*colliderPadding,height),Vector2D(position.x+colliderPadding,position.y),velocity);
+    runAnimation=Animation(1,2,1,0.1,0.1);
+    idle=Animation(0,0,0,0,0);
+    jump=Animation(4,4,4,0,0);
 }
 
 void Player::Init()
 {
     try{
-        string playerTexturePath="mario/Art/Mario_Small_Idle.png";
+        string playerTexturePath="mario/Art/MarioFullSheet.png";
 
         if(!FileExists(playerTexturePath.c_str()))  throw runtime_error("Failed to get file at "+ playerTexturePath);
         else cout<<"Player texture is found";
 
         playerTexture=LoadTexture(playerTexturePath.c_str());
+
     }
     catch(const runtime_error& e)
     {   
@@ -37,7 +41,7 @@ void Player::Init()
 
 void Player::Update(float dt)
 {
-    
+    runAnimation.AnimationUpdate(dt);
     HandleInput(dt);
 
     ApplyGravity(dt);
@@ -261,7 +265,37 @@ void Player::Render()
 {
     //DrawRectangleV((Vector2){position.x, position.y}, (Vector2){(float)width, (float)height}, RED);
     
-    DrawTexturePro(playerTexture, {0, 0, lastInputAxis*(float)playerTexture.width, (float)playerTexture.height}, {position.x, position.y, (float)width, (float)height}, {0, 0}, 0.0f, WHITE);
+    // Since everything is on one spritesheet now, we only need one active texture!
+    Texture2D activeTexture = playerTexture;
+    Rectangle sourceRect;
+
+    // If the player is moving, use the run animation!
+    if (inputAxisX != 0) 
+    {
+        sourceRect = runAnimation.AnimationFrame(5);
+    }
+    else // Otherwise, use the idle texture
+    {
+        sourceRect = idle.AnimationFrame(5);
+    }
+
+    // Override with jump animation if we are in the air!
+    if(velocity.y != 0)
+    {
+        sourceRect = jump.AnimationFrame(5);
+    }
+
+    // Apply the left/right flip universally to whichever animation is playing!
+    sourceRect.width *= lastInputAxis;
+
+    DrawTexturePro(
+        activeTexture, 
+        sourceRect, 
+        {position.x, position.y, (float)width, (float)height}, 
+        {0, 0}, 
+        0.0f, 
+        WHITE
+    );
    
     /*for(const auto& hit : debugHits)                  Debug to check collision normal and hit status with tiles.
     {
