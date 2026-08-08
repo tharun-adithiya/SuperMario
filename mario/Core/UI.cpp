@@ -7,7 +7,7 @@ void UI::DrawCoinsCollectedUI(int coins)
     const int padding = 10;
 
     const char* text= TextFormat("Coins: %d",coins);
-
+ 
     int textWidth = MeasureText(text, fontSize);
 
     int x= GetScreenWidth() - textWidth - padding;

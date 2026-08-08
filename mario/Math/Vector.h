@@ -31,6 +31,13 @@ struct Vector2D
         return *this;
     }
 
+    Vector2D& operator-=(const Vector2D& other)
+    {
+        x -= other.x;
+        y -= other.y;
+        return *this;
+    }
+
     float Length() const                          
     {
         return sqrt(x * x + y * y);

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include "Entities/Block.h"
+#include "Entities/MovingTile.h"
 using namespace std;
 Tilemap::Tilemap(int width, int height, int tileSize)
 {
@@ -32,7 +33,7 @@ void Tilemap::Load()
     this->height = levelString.size();
     this->width = 0;
     for(const auto& r : levelString) {
-        if(r.size() > this->width) {
+        if((int)r.size() > this->width) {
             this->width = r.size();
         }
     }
@@ -52,9 +53,9 @@ void Tilemap::Load()
         //grid2[height-1][x] = Tile(MyRect(Vector2D(tileSize,tileSize),Vector2D(0,0)),TileType::Ground); // Set bottom row to ground
 
     }*/
-    for(int y=0; y < height && y < levelString.size(); y++)
+    for(int y=0; y < height && y < (int)levelString.size(); y++)
     {
-        for(int x=0; x < width && x < levelString[y].size(); x++)
+        for(int x=0; x < width && x < (int)levelString[y].size(); x++)
         {
             if(levelString[y][x]=='1')
             {
@@ -71,6 +72,15 @@ void Tilemap::Load()
     }
 
     end= LevelEndCollider(Vector2D(-1000,650),Vector2D(10000,tileSize));
+
+    movingTile = MovingTile(
+        Vector2D(700, 450),
+        Vector2D(900, 450),
+        Vector2D(100, 20),
+        120.0f,
+        100.0f,
+        0.0f
+    );
 }
 void Tilemap::ResetWorldItems()
 {
@@ -129,6 +139,7 @@ void Tilemap::Render()
                 );
         DrawRectangleLinesEx((Rectangle){coins[i].triggerCollider.position.x, coins[i].triggerCollider.position.y, coins[i].triggerCollider.size.x, coins[i].triggerCollider.size.y}, 1.0f, GREEN);  //Collider bounds
     }
+    movingTile.Render();
 
 }
 void Tilemap::Update(float dt)
@@ -137,6 +148,7 @@ void Tilemap::Update(float dt)
     {
         block->Update(dt);
     }
+    movingTile.Update(dt);
 }
 
 

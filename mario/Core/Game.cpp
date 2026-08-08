@@ -12,6 +12,8 @@ void Game::Init()
 {
     InitWindow(800, 600, "Mario");
     player.Init(); 
+    goompa=Goompa({300,100});
+    goompa.InitTexture();
     tilemap=Tilemap(100, 50, 50); // Initialize tilemap with width, height, and tile size
     tilemap.Load(); // Load tile data
     SetTargetFPS(60);
@@ -29,6 +31,7 @@ void Game::Update(float dt)
 {
     tilemap.Update(dt);
     player.Update(dt);
+    goompa.Update(dt);
     camera.target = (Vector2){ player.GetPosition().x, player.GetPosition().y };
 
     if(IsKeyPressed(KEY_T)&&!isDebugOn) isDebugOn=true;
@@ -40,9 +43,9 @@ void Game::Render()
 {
     BeginDrawing();
     ClearBackground(BLUE);
-    
     BeginMode2D(camera);
     player.Render();
+    goompa.Render();
     tilemap.Render();
     if(isDebugOn)
     {

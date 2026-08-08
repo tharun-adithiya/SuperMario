@@ -36,6 +36,7 @@ class BreakableBlock : public Block
     public:
         
         float startY;
+        boxCollider2D hitCollider;
         BreakableBlock(){
             type= BlockType::BreakableBlock;
             position= Vector2D(0,0);
@@ -48,8 +49,8 @@ class BreakableBlock : public Block
             type= BlockType::BreakableBlock;
             isBroken=false;
             startY = position.y;
-            //Vector2D colliderSize(size.x/2,size.y); Experimental: To prevent breaking two adjacent tiles with a single jump
             collider = boxCollider2D(size,position);
+            hitCollider = boxCollider2D({size.x / 2.0f, size.y}, {position.x + size.x / 4.0f, position.y});
         }
         void Update(float dt) override;
         void Render(Texture2D texture,Rectangle texCoords) override;

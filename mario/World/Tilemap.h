@@ -3,6 +3,7 @@
 #include "Math/AABB.h"
 #include <memory>
 #include "Entities/Block.h"
+#include "Entities/MovingTile.h"
 using namespace std;
 
 
@@ -83,6 +84,7 @@ class Tilemap
     std::vector<std::unique_ptr<Block>> interactiveBlocks;
     vector<vector<int>> grid; // 2D vector to hold tile data
     vector<vector<Tile>> tileGrid;
+    MovingTile movingTile;
     vector<Coin> coins;
     public:
     Tilemap() : width(0), height(0), tileSize(0) {}
@@ -103,6 +105,7 @@ class Tilemap
     int GetTileSize() { return tileSize; } 
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
+    MovingTile& GetMovingTile() { return movingTile; }
     boxCollider2D GetLevelEndCollider() {return end.collider;}
     //AABB GetTileAABB(int x, int y) { return AABB(Vector2D(x*tileSize, y*tileSize), Vector2D((x+1)*tileSize, (y+1)*tileSize)); } //Gets AABB for a specific tile.
     

@@ -5,6 +5,7 @@
 #include "World/Tilemap.h"
 #include "Core/Game.h"
 #include "Physics/CollisionResolver.h"
+#include "Entities/MovingTile.h"
 using namespace std;
 Player::Player()
 {
@@ -66,6 +67,7 @@ void Player::Update(float dt)
     PerformCollisionCheckAgainstTriggers(dt);
     PerformCollisionCheckAgainstBlocks(dt);
     PerformCollisionCheckAgainstLevelEnd(dt);
+    PerformCollisionCheckAgainstMovingTiles(dt);
     position += velocity * dt;
     // Center the collider horizontally based on how much smaller it is than the visual width
     collider.position = Vector2D(position.x + (width - collider.size.x) / 2.0f, position.y);
@@ -73,7 +75,7 @@ void Player::Update(float dt)
 
 void Player::PerformCollisionCheckAgainstTiles(float dt)
 {
-    // Calculate the swept area for debugging
+    // Calculates the swept area for debugging
     float minX = std::min(collider.position.x, collider.position.x + velocity.x * dt);
     float minY = std::min(collider.position.y, collider.position.y + velocity.y * dt);
     float maxX = std::max(collider.position.x + collider.size.x, collider.position.x + collider.size.x + velocity.x * dt);
@@ -154,19 +156,21 @@ void Player:: PerformCollisionCheckAgainstBlocks(float dt)
         {
             case BlockType::BreakableBlock:
             {
-                //5cout<<"Checking breakable block";
-                
-                if(info.hit&&info.contactNormal==Vector2D{0,1})
-                {
-                    cout<<"Hit from below";
-                    CollisionResolver::Resolve(velocity,info);
-                    collider.velocity = velocity; // update collider velocity after resolution
-                    block->OnHitFromBelow();
-                }
-                else if(info.hit)
+                if(info.hit)
                 {
                     CollisionResolver::Resolve(velocity,info);
                     collider.velocity = velocity; // update collider velocity after resolution
+                    
+                    if(info.contactNormal==Vector2D{0,1})
+                    {
+                        BreakableBlock* bBlock = static_cast<BreakableBlock*>(block.get());
+                        CollisionInfo hitInfo = AABB::DynamicRectVsRect(collider, bBlock->hitCollider, dt);
+                        if (hitInfo.hit && hitInfo.contactNormal == Vector2D{0,1})
+                        {
+                            cout<<"Hit from below";
+                            block->OnHitFromBelow();
+                        }
+                    }
                 }
                 
                 break;
@@ -186,6 +190,47 @@ void Player::PerformCollisionCheckAgainstLevelEnd(float dt)
     {
         cout<<"Player hit level end";
         Game::Instance.Restart();
+    }
+}
+
+void Player::PerformCollisionCheckAgainstMovingTiles(float dt)
+{
+    MovingTile& tile = Game::tilemap.GetMovingTile();
+
+    collider.velocity = velocity;
+    CollisionInfo info = AABB::DynamicRectVsDynamicRect(collider, tile.collider, dt);
+
+    if (!info.hit) return;
+
+    if (info.contactNormal.y == -1)
+        isGrounded = true;
+
+    CollisionResolver::ResolveDynamic(
+        velocity,
+        tile.collider.velocity,
+        1.0f,
+        tile.mass,
+        tile.restitution,
+        info
+    );
+
+    collider.velocity = velocity;
+
+    float penetration = 0.0f;
+    if (info.contactNormal.x > 0.0f)
+        penetration = (tile.collider.position.x + tile.collider.size.x) - collider.position.x;
+    else if (info.contactNormal.x < 0.0f)
+        penetration = (collider.position.x + collider.size.x) - tile.collider.position.x;
+    else if (info.contactNormal.y > 0.0f)
+        penetration = (tile.collider.position.y + tile.collider.size.y) - collider.position.y;
+    else if (info.contactNormal.y < 0.0f)
+        penetration = (collider.position.y + collider.size.y) - tile.collider.position.y;
+
+    if (penetration > 0.0f)
+    {
+        position += info.contactNormal * penetration;
+        collider.position.x = position.x + (width - collider.size.x) / 2.0f;
+        collider.position.y = position.y;
     }
 }
 
@@ -257,7 +302,16 @@ void Player::Jump()
 
 void Player::ApplyGravity(float dt)     // This function applies gravity to the player, affecting the vertical velocity and position
 {
-    velocity.y += gravity * dt;        // 9.81 is the gravitation constant for earth, you can adjust it for different gravity strength 
+    if (isGrounded) {
+        airTime = 0.0f;
+    } else {
+        airTime += dt;
+    }
+
+    // Apply a gravity curve so the jump feels less floaty at the peak/fall
+    float gravityMultiplier = 1.0f + (airTime * airTime);
+
+    velocity.y += gravity * gravityMultiplier * dt;        // 9.81 is the gravitation constant for earth, you can adjust it for different gravity strength 
     velocity.y = std::min(velocity.y, maxFallSpeed); // Limit the falling speed to prevent excessive velocity
 }
 

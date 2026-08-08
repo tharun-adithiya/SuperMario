@@ -35,8 +35,9 @@ class Player
 
         float gravity = 9.81*35;
         float maxFallSpeed = 1000;
+        float airTime = 0;
 
-        float maxSpeed=300;
+        float maxSpeed=350;
         float builtUpSpeed=0;
         float rateofBuiltUpSpeed=5;
 
@@ -61,6 +62,7 @@ class Player
         void PerformCollisionCheckAgainstTriggers(float dt);
         void PerformCollisionCheckAgainstBlocks(float dt);
         void PerformCollisionCheckAgainstLevelEnd(float dt);
+        void PerformCollisionCheckAgainstMovingTiles(float dt);
         void HandleInput(float dt);
         void Render();
         void Move(float dt);

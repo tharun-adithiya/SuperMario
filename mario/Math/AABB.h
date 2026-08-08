@@ -50,7 +50,6 @@ struct CollisionInfo
 struct AABB
 {
 
-
     static bool RayVsRect(const Vector2D &rayOrigin , const Vector2D & velocityVec, const boxCollider2D & stationaryTarget, float & time_hit_near, Vector2D &contact_point, Vector2D & contact_normal)
     {
         contact_normal= {0,0};
@@ -121,8 +120,9 @@ struct AABB
             thisCollisionInfo.contactNormal
         ))
         {
-            if(thisCollisionInfo.collisionTime<=1.0f&&thisCollisionInfo.collisionTime>=0.0f) 
+            if(thisCollisionInfo.collisionTime<=1.0f) 
             {
+                if(thisCollisionInfo.collisionTime < 0.0f) thisCollisionInfo.collisionTime = 0.0f;
                 thisCollisionInfo.hit=true;
 
                 return thisCollisionInfo;
@@ -131,6 +131,34 @@ struct AABB
 
         return thisCollisionInfo;
 
+    }
+
+    static CollisionInfo DynamicRectVsDynamicRect(const boxCollider2D &A, const boxCollider2D &B, float &dt)
+    {
+        CollisionInfo info;
+
+        Vector2D relVel = A.velocity - B.velocity;
+        if (relVel.x == 0 && relVel.y == 0) return info;
+
+        boxCollider2D expanded;
+        expanded.position = B.position - A.size / 2;
+        expanded.size     = B.size + A.size;
+
+        if (RayVsRect(
+            A.position + A.size / 2,
+            relVel * dt,
+            expanded,
+            info.collisionTime,
+            info.contactPoint,
+            info.contactNormal))
+        {
+            if (info.collisionTime <= 1.0f)
+            {
+                if (info.collisionTime < 0.0f) info.collisionTime = 0.0f;
+                info.hit = true;
+            }
+        }
+        return info;
     }
     
 };

@@ -2,12 +2,13 @@
 #include <raylib.h>
 #include "Entities/Player.h"
 #include "World/Tilemap.h"
+#include "Entities/Enemy.h"
 #include "UI.h"
 class Game
 {
     private:
         Player player;
-        
+        Goompa goompa;
         bool isDebugOn=false;
         Camera2D camera;
         UI ui;
