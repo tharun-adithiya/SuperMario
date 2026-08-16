@@ -5,12 +5,15 @@
 #include "Math/Vector.h"
 #include "Math/AABB.h"
 Tilemap Game::tilemap;
+AudioSystem Game::audioSystem;
 int Game::coinsColected = 0;
 Game Game::Instance;
-
 void Game::Init()
 {
     InitWindow(800, 600, "Mario");
+    audioSystem.Init();
+    audioSystem.LoadMusic("mario/Audio/MainBGM.mp3");
+    audioSystem.PlayMusic();
     player.Init(); 
     goompa=Goompa({300,100});
     goompa.InitTexture();
@@ -30,6 +33,7 @@ void Game::Init()
 void Game::Update(float dt)
 {
     tilemap.Update(dt);
+    audioSystem.Update(dt);
     player.Update(dt);
     goompa.Update(dt);
     camera.target = (Vector2){ player.GetPosition().x, player.GetPosition().y };
@@ -82,6 +86,7 @@ void Game::Restart()
 
 void Game::Shutdown()
 {
+    audioSystem.ShutDown();
     CloseWindow();
 }
 

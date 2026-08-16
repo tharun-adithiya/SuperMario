@@ -18,6 +18,7 @@ class Enemy
         float gravity=9.81*50;
         float maxFallSpeed=1000;
         bool isGrounded;
+        bool isDead;
 
         Enemy()
         {
@@ -36,31 +37,41 @@ class Enemy
         virtual void InitTexture() {}
         virtual void Update(float dt) {}
         virtual void Render() {}
-        virtual void TakeDamage() {}
-        virtual void Die() {}
+        virtual void TakeDamage() {}        
         virtual void PerformCollisionCheckAgainstTiles(float dt) {}
         virtual void Patrol(const Vector2D& Apos, const Vector2D& Bpos, float dt) {}
+
+        public:
+        bool IsDead() const { return isDead; }
+        virtual void Die() {}
+        virtual boxCollider2D getCollider(){return collider;}
 
 };
 
 class Goompa : public Enemy
 {
     private:
-        Animation walkAnim; 
+        Animation walkAnim;
+        Animation deathAnimation;
     public:
         Goompa()
         {
             walkAnim=Animation(0,1,0,0.1,0.1);
+            deathAnimation=Animation(2,2,2,0,0);
         }
-        Goompa(Vector2D position) : Enemy(position,30,30)
+        Goompa(Vector2D position) : Enemy(position,40,40)
         {
             walkAnim=Animation(0,1,0,0.1,0.1);
+            deathAnimation=Animation(2,2,2,0,0);
         } 
         void InitTexture() override;
         void Update(float dt) override;
         void PerformCollisionCheckAgainstTiles(float dt)override;
         void Render() override;
         void TakeDamage() override;
-        void Die() override;
         void Patrol(const Vector2D& Apos, const Vector2D& Bpos, float dt) override;
+
+        public:
+        boxCollider2D getCollider() override {return collider;};
+        void Die() override;
 };

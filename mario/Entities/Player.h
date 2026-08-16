@@ -48,6 +48,7 @@ class Player
         float JumpbufferTimer=0;
 
         float jumpHeight=57;
+        float bounceHeight=50;
 
         int inputAxisX=0;
         int lastInputAxis=1;
@@ -63,6 +64,7 @@ class Player
         void PerformCollisionCheckAgainstBlocks(float dt);
         void PerformCollisionCheckAgainstLevelEnd(float dt);
         void PerformCollisionCheckAgainstMovingTiles(float dt);
+        void PerformCollisionCheckAgainstEnemies(float dt);
         void HandleInput(float dt);
         void Render();
         void Move(float dt);

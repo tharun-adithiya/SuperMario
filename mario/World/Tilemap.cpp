@@ -5,7 +5,16 @@
 #include <fstream>
 #include "Entities/Block.h"
 #include "Entities/MovingTile.h"
+#include "Core/Game.h"
+//#include "Core/AudioSystem.h"
 using namespace std;
+
+void Coin::OnCoinCollected()
+{
+    Game::audioSystem.PlaySoundEffect(SoundFiles::CoinCollectedSound);
+    DisableCoin();
+}
+
 Tilemap::Tilemap(int width, int height, int tileSize)
 {
     this->width = width;
@@ -73,14 +82,14 @@ void Tilemap::Load()
 
     end= LevelEndCollider(Vector2D(-1000,650),Vector2D(10000,tileSize));
 
-    movingTile = MovingTile(
+    /*movingTile = MovingTile(
         Vector2D(700, 450),
         Vector2D(900, 450),
         Vector2D(100, 20),
         120.0f,
         100.0f,
         0.0f
-    );
+    );*/
 }
 void Tilemap::ResetWorldItems()
 {
@@ -137,9 +146,9 @@ void Tilemap::Render()
                     ,0.0f
                     ,WHITE
                 );
-        DrawRectangleLinesEx((Rectangle){coins[i].triggerCollider.position.x, coins[i].triggerCollider.position.y, coins[i].triggerCollider.size.x, coins[i].triggerCollider.size.y}, 1.0f, GREEN);  //Collider bounds
+       //DrawRectangleLinesEx((Rectangle){coins[i].triggerCollider.position.x, coins[i].triggerCollider.position.y, coins[i].triggerCollider.size.x, coins[i].triggerCollider.size.y}, 1.0f, GREEN);  //Collider bounds
     }
-    movingTile.Render();
+    //movingTile.Render();
 
 }
 void Tilemap::Update(float dt)
@@ -148,7 +157,7 @@ void Tilemap::Update(float dt)
     {
         block->Update(dt);
     }
-    movingTile.Update(dt);
+    //movingTile.Update(dt);
 }
 
 

@@ -142,7 +142,7 @@ struct AABB
 
         boxCollider2D expanded;
         expanded.position = B.position - A.size / 2;
-        expanded.size     = B.size + A.size;
+        expanded.size = B.size + A.size;
 
         if (RayVsRect(
             A.position + A.size / 2,
@@ -154,7 +154,7 @@ struct AABB
         {
             if (info.collisionTime <= 1.0f)
             {
-                if (info.collisionTime < 0.0f) info.collisionTime = 0.0f;
+                //if (info.collisionTime < 0.0f) info.collisionTime = 0.0f;
                 info.hit = true;
             }
         }

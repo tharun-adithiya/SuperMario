@@ -67,6 +67,7 @@ void Player::Update(float dt)
     PerformCollisionCheckAgainstTriggers(dt);
     PerformCollisionCheckAgainstBlocks(dt);
     PerformCollisionCheckAgainstLevelEnd(dt);
+    PerformCollisionCheckAgainstEnemies(dt);
     PerformCollisionCheckAgainstMovingTiles(dt);
     position += velocity * dt;
     // Center the collider horizontally based on how much smaller it is than the visual width
@@ -137,6 +138,7 @@ void Player :: PerformCollisionCheckAgainstTriggers(float dt)
             cout<<"Coin is hit\n";
             Game::updateCoins();
             cout<<"Current coins:"<<Game::GetCoins();
+            coin.OnCoinCollected();
             coin.DisableCoin();
         }
     }
@@ -233,6 +235,29 @@ void Player::PerformCollisionCheckAgainstMovingTiles(float dt)
         collider.position.y = position.y;
     }
 }
+ void Player::PerformCollisionCheckAgainstEnemies(float dt)
+ {
+    Goompa& goompa=Game::Instance.getGoompa();
+    collider.velocity=velocity;
+    CollisionInfo info=AABB::DynamicRectVsDynamicRect(collider,goompa.getCollider(),dt);
+
+    if(info.hit&&info.contactNormal.y==-1)
+    {
+         cout<<"Hit goomba from above";
+         velocity.y = -sqrt(2 * gravity * bounceHeight);
+         goompa.Die();
+    }
+    else if (info.hit && !goompa.IsDead())
+    {
+         cout << "Player hit by Goompa";
+         float knockbackForceX = 800.0f;
+         float knockbackHeight = 40.0f;
+         
+         // Use the collision normal to perfectly push the player away!
+         velocity.x = info.contactNormal.x * knockbackForceX;
+         velocity.y = -sqrt(2 * gravity * knockbackHeight);
+    }
+ }
 
 void Player::HandleInput(float dt)
 {
@@ -308,11 +333,11 @@ void Player::ApplyGravity(float dt)     // This function applies gravity to the 
         airTime += dt;
     }
 
-    // Apply a gravity curve so the jump feels less floaty at the peak/fall
+    // Applis a gravity curve so the jump feels less floaty at the peak/fall
     float gravityMultiplier = 1.0f + (airTime * airTime);
 
-    velocity.y += gravity * gravityMultiplier * dt;        // 9.81 is the gravitation constant for earth, you can adjust it for different gravity strength 
-    velocity.y = std::min(velocity.y, maxFallSpeed); // Limit the falling speed to prevent excessive velocity
+    velocity.y += gravity * gravityMultiplier * dt;        // 9.81 is the gravitation constant for earth, we can adjust it for different gravity strength 
+    velocity.y = std::min(velocity.y, maxFallSpeed); // Limits the falling speed to prevent excessive velocity
 }
 
 void Player::Render()

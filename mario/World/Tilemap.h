@@ -38,6 +38,7 @@ struct Coin
     {
         this->isCollected = true;
     }
+    void OnCoinCollected();
 };
 
 struct LevelEndCollider

@@ -1,5 +1,6 @@
 #include "Block.h"
 #include "raylib.h"
+#include "Core/Game.h"
 void Block:: Update(float dt)
 {   
 
@@ -30,6 +31,7 @@ void BreakableBlock :: Render(Texture2D texture,Rectangle texCoords)
 
 void BreakableBlock :: OnHitFromBelow()
 {
+    Game::audioSystem.PlaySoundEffect(SoundFiles::BrickDestroySound);    
     this->isBroken=true;
 }
 

@@ -12,7 +12,7 @@ void Goompa::Update(float dt)
     velocity.y+=gravity*dt;
     velocity.y=min(velocity.y,maxFallSpeed);
     isGrounded = false;
-    Patrol(Vector2D(300,0),Vector2D(450,0),dt);
+    if(!isDead)Patrol(Vector2D(300,0),Vector2D(450,0),dt);
     collider.velocity=velocity;
     PerformCollisionCheckAgainstTiles(dt);
     position+=velocity*dt;
@@ -53,7 +53,11 @@ void Goompa::Render()
 {
     Texture2D activeTexture=texture;
     Rectangle source;
-    source=walkAnim.AnimationFrame(3);
+    if(isDead)
+    {
+        source=deathAnimation.AnimationFrame(3);   
+    }
+    else source=walkAnim.AnimationFrame(3);
     DrawTexturePro(activeTexture,source,{position.x,position.y,width,height},{0,0},0,WHITE);
 }
 void Goompa:: Patrol(const Vector2D& aPos, const Vector2D& bPos, float dt)
@@ -75,7 +79,10 @@ void Goompa::TakeDamage()
 }
 void Goompa::Die()
 {
-
+    cout<<"Invoked Die()";
+    isDead=true;
+    velocity.x=0;
+    collider.velocity.x=0;
 }
 void Goompa::InitTexture()
 {

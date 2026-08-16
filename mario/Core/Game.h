@@ -4,9 +4,13 @@
 #include "World/Tilemap.h"
 #include "Entities/Enemy.h"
 #include "UI.h"
+#include "AudioSystem.h"
+#include <memory>
+using namespace std;
 class Game
 {
     private:
+        
         Player player;
         Goompa goompa;
         bool isDebugOn=false;
@@ -17,6 +21,7 @@ class Game
         Game(){};
         static Game Instance;
         static Tilemap tilemap;
+        static AudioSystem audioSystem;
         void Init();
         void Restart();
         void Update(float dt);
@@ -24,5 +29,6 @@ class Game
         void Shutdown();
         static int GetCoins(){return coinsColected;}
         static void updateCoins() {coinsColected++;}
+        Goompa& getGoompa(){return goompa;}
 };
 
