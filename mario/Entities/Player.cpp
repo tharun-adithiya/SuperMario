@@ -21,6 +21,7 @@ Player::Player()
     runAnimation=Animation(1,2,1,0.1,0.1);
     idle=Animation(0,0,0,0,0);
     jump=Animation(4,4,4,0,0);
+    deathAnim=Animation(5,5,5,0,0);
 }
 
 void Player::Init()
@@ -191,7 +192,8 @@ void Player::PerformCollisionCheckAgainstLevelEnd(float dt)
     if(info.hit)
     {
         cout<<"Player hit level end";
-        Game::Instance.Restart();
+        Die();
+        //Game::Instance.Restart();
     }
 }
 
@@ -238,26 +240,47 @@ void Player::PerformCollisionCheckAgainstMovingTiles(float dt)
  void Player::PerformCollisionCheckAgainstEnemies(float dt)
  {
     Goompa& goompa=Game::Instance.getGoompa();
+    if (goompa.IsDead()) return; // Early exit: ignore dead enemies
+
     collider.velocity=velocity;
     CollisionInfo info=AABB::DynamicRectVsDynamicRect(collider,goompa.getCollider(),dt);
 
     if(info.hit&&info.contactNormal.y==-1)
     {
          cout<<"Hit goomba from above";
+         Game::audioSystem.PlaySoundEffect(SoundFiles::StompSound);
          velocity.y = -sqrt(2 * gravity * bounceHeight);
          goompa.Die();
     }
     else if (info.hit && !goompa.IsDead())
     {
          cout << "Player hit by Goompa";
-         float knockbackForceX = 800.0f;
-         float knockbackHeight = 40.0f;
-         
-         // Use the collision normal to perfectly push the player away!
-         velocity.x = info.contactNormal.x * knockbackForceX;
-         velocity.y = -sqrt(2 * gravity * knockbackHeight);
+         Die();
     }
  }
+
+void Player::Die() 
+{
+    if (isDead) return;
+    isDead = true;
+    velocity.x = 0;
+    velocity.y = -sqrt(2 * gravity * jumpHeight * 0.5f);
+    collider.size = {0, 0};
+    
+    if (OnDeathEvent) {
+        OnDeathEvent();
+    }
+}
+
+void Player::UpdateDeathAnimation(float dt) 
+{
+    velocity.y += gravity * dt;
+    position.y += velocity.y * dt;
+
+    if (position.y > 1000) {
+        Game::Instance.Restart();
+    }
+}
 
 void Player::HandleInput(float dt)
 {
@@ -272,12 +295,13 @@ void Player::HandleInput(float dt)
     if(JumpbufferTimer > 0 &&
     (isGrounded || coyoteTimer > 0))
     {
+        Game::audioSystem.PlaySoundEffect(SoundFiles::JumpSound);
         Jump();
 
         JumpbufferTimer = 0;
         coyoteTimer = 0;
     }
-    if((IsKeyReleased(KEY_W)||IsKeyPressed(KEY_UP))&&velocity.y<0)          //Variable jump height
+    if((IsKeyReleased(KEY_W)||IsKeyReleased(KEY_UP))&&velocity.y<0)          //Variable jump height
     {
         velocity.y*=0.52f;
     }
@@ -342,11 +366,15 @@ void Player::ApplyGravity(float dt)     // This function applies gravity to the 
 
 void Player::Render()
 {
-    //DrawRectangleV((Vector2){position.x, position.y}, (Vector2){(float)width, (float)height}, RED);
-    
-    // Since everything is on one spritesheet now, we only need one active texture!
     Texture2D activeTexture = playerTexture;
     Rectangle sourceRect;
+
+    if (isDead) {
+        sourceRect = deathAnim.AnimationFrame(6);
+        sourceRect.width *= lastInputAxis;
+        DrawTexturePro(activeTexture, sourceRect, {position.x, position.y, (float)width, (float)height}, {0, 0}, 0.0f, WHITE);
+        return;
+    }
 
     // If the player is moving, use the run animation!
     if (inputAxisX != 0) 
@@ -386,6 +414,7 @@ void Player::Render()
 
 void Player::ResetPlayer()
 {
+    isDead = false;
     position = Vector2D(100, 100);
     playerCenter = Vector2D(position.x + width/2, position.y + height/2);
     velocity = Vector2D(0, 0);

@@ -7,6 +7,14 @@
 #include "AudioSystem.h"
 #include <memory>
 using namespace std;
+
+enum GameState
+{
+    PLAYING,
+    PLAYER_DIES,
+    GAME_OVER
+};
+
 class Game
 {
     private:
@@ -18,6 +26,7 @@ class Game
         UI ui;
         static int coinsColected;
     public:
+        GameState currentState = PLAYING;
         Game(){};
         static Game Instance;
         static Tilemap tilemap;

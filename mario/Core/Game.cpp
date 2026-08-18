@@ -8,12 +8,19 @@ Tilemap Game::tilemap;
 AudioSystem Game::audioSystem;
 int Game::coinsColected = 0;
 Game Game::Instance;
+
+
 void Game::Init()
 {
     InitWindow(800, 600, "Mario");
+    
+    currentState = PLAYING;
+    player.OnDeathEvent = [this]() {
+        this->currentState = PLAYER_DIES;
+        audioSystem.PlayMusic(DEATH_MUSIC);
+    };
     audioSystem.Init();
-    audioSystem.LoadMusic("mario/Audio/MainBGM.mp3");
-    audioSystem.PlayMusic();
+    audioSystem.PlayMusic(GAME_MUSIC);
     player.Init(); 
     goompa=Goompa({300,100});
     goompa.InitTexture();
@@ -32,11 +39,17 @@ void Game::Init()
 
 void Game::Update(float dt)
 {
-    tilemap.Update(dt);
     audioSystem.Update(dt);
-    player.Update(dt);
-    goompa.Update(dt);
-    camera.target = (Vector2){ player.GetPosition().x, player.GetPosition().y };
+
+    if (currentState == PLAYING) {
+        tilemap.Update(dt);
+        player.Update(dt);
+        goompa.Update(dt);
+        camera.target = (Vector2){ player.GetPosition().x, player.GetPosition().y };
+    } 
+    else if (currentState == PLAYER_DIES) {
+        player.UpdateDeathAnimation(dt);
+    }
 
     if(IsKeyPressed(KEY_T)&&!isDebugOn) isDebugOn=true;
     else if (IsKeyPressed(KEY_T)&& isDebugOn) isDebugOn=false;
@@ -48,9 +61,10 @@ void Game::Render()
     BeginDrawing();
     ClearBackground(BLUE);
     BeginMode2D(camera);
+    tilemap.Render();
     player.Render();
     goompa.Render();
-    tilemap.Render();
+    
     if(isDebugOn)
     {
         //Debug::DrawWorldGrid(tilemap.GetTileSize(), tilemap.GetWidth(), tilemap.GetHeight());
@@ -73,6 +87,8 @@ void Game::Render()
 
 void Game::Restart()
 {
+    currentState = PLAYING;
+    audioSystem.PlayMusic(GAME_MUSIC);
     player.ResetPlayer();
     tilemap.ResetWorldItems();
     coinsColected=0;

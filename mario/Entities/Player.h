@@ -4,6 +4,7 @@
 #include "Math/AABB.h"
 #include "Graphics/Animation.h"
 #include "raylib.h"
+#include <functional>
 class Player
 {
     private:
@@ -13,6 +14,8 @@ class Player
         Animation runAnimation;
         Animation idle;
         Animation jump;
+        Animation deathAnim;
+        bool isDead = false;
 
         //Transform properties
         Vector2D position;
@@ -47,13 +50,16 @@ class Player
         float JumpbufferTime=0.15;
         float JumpbufferTimer=0;
 
-        float jumpHeight=57;
+        float jumpHeight=65;
         float bounceHeight=50;
 
         int inputAxisX=0;
         int lastInputAxis=1;
 
     public:
+        std::function<void()> OnDeathEvent;
+        void Die();
+        void UpdateDeathAnimation(float dt);
         
         Player();
         void Init();

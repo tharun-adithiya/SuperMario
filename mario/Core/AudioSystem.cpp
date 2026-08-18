@@ -4,25 +4,33 @@ void AudioSystem::Init()
 {
     InitAudioDevice();
     
-    sounds.resize(2);
+    sounds.resize(4);
     sounds[CoinCollectedSound] = LoadSound("mario/Audio/coinCollected.wav");
     sounds[BrickDestroySound] = LoadSound("mario/Audio/breakBrick.wav");
+    sounds[JumpSound]=LoadSound("mario/Audio/JumpSound.wav");
+    sounds[StompSound]=LoadSound("mario/Audio/stompSound.wav");
+    
+    musicStreams.resize(3);
+    musicStreams[GAME_MUSIC] = LoadMusicStream("mario/Audio/MainBGM.mp3");
+    musicStreams[DEATH_MUSIC] = LoadMusicStream("mario/Audio/deathMusic.wav");
+    musicStreams[GAME_OVER_MUSIC] = LoadMusicStream("mario/Audio/deathMusic.wav");
 }
 
 void AudioSystem::Update(float dt)
 {
-    UpdateMusicStream(musicSource);
+    UpdateMusicStream(musicStreams[(int)currentMusic]);
 }
 
-void AudioSystem::LoadMusic(string musicPath)
+void AudioSystem::PlayMusic(MusicFiles musicId)
 {
-    if(FileExists(musicPath.c_str()))
-        musicSource=LoadMusicStream(musicPath.c_str());
+    StopMusicStream(musicStreams[(int)currentMusic]);
+    currentMusic = musicId;
+    PlayMusicStream(musicStreams[(int)currentMusic]);
 }
 
-void AudioSystem::PlayMusic()
+void AudioSystem::StopMusic()
 {
-    PlayMusicStream(musicSource);
+    StopMusicStream(musicStreams[(int)currentMusic]);
 }
 
 void AudioSystem::PlaySoundEffect(SoundFiles soundId)
@@ -37,6 +45,9 @@ void AudioSystem::ShutDown()
 {
     for (Sound& s : sounds) {
         UnloadSound(s);
+    }
+    for (Music& m : musicStreams) {
+        UnloadMusicStream(m);
     }
     CloseAudioDevice();
 }

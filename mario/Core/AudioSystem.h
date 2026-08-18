@@ -4,23 +4,33 @@
 #include <vector>
 using namespace std;
 
+enum MusicFiles
+{
+    GAME_MUSIC,
+    DEATH_MUSIC,
+    GAME_OVER_MUSIC
+};
+
 enum SoundFiles
 {
     CoinCollectedSound,
-    BrickDestroySound
+    BrickDestroySound,
+    JumpSound,
+    StompSound,
 };
 
 class AudioSystem
 {
     private:
-        Music musicSource;
+        std::vector<Music> musicStreams;
+        MusicFiles currentMusic = GAME_MUSIC;
         std::vector<Sound> sounds;
     public: 
         static AudioSystem Instance;
         void Update(float dt);
         void Init();
-        void LoadMusic(string musicPath);
-        void PlayMusic();
+        void PlayMusic(MusicFiles musicId);
+        void StopMusic();
         void PlaySoundEffect(SoundFiles soundId);
         void ShutDown();
 };

@@ -17,8 +17,10 @@ class Enemy
         float width, height;
         float gravity=9.81*50;
         float maxFallSpeed=1000;
-        bool isGrounded;
-        bool isDead;
+        bool isGrounded = false;
+        bool isDead = false;
+        float deathTimer = 0.0f;
+        bool isCompletelyGone = false;
 
         Enemy()
         {
@@ -43,6 +45,7 @@ class Enemy
 
         public:
         bool IsDead() const { return isDead; }
+        bool IsCompletelyGone() const { return isCompletelyGone; }
         virtual void Die() {}
         virtual boxCollider2D getCollider(){return collider;}
 

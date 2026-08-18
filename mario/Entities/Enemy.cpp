@@ -8,11 +8,23 @@
 using namespace std;
 void Goompa::Update(float dt)
 {
-    walkAnim.AnimationUpdate(dt);
+    if (isCompletelyGone) return;
+
+    if (isDead) {
+        deathTimer += dt;
+        if (deathTimer >= 0.8f) {
+            isCompletelyGone = true;
+            return;
+        }
+    } else {
+        walkAnim.AnimationUpdate(dt);
+        Patrol(Vector2D(300,0),Vector2D(450,0),dt);
+    }
+
     velocity.y+=gravity*dt;
     velocity.y=min(velocity.y,maxFallSpeed);
     isGrounded = false;
-    if(!isDead)Patrol(Vector2D(300,0),Vector2D(450,0),dt);
+    
     collider.velocity=velocity;
     PerformCollisionCheckAgainstTiles(dt);
     position+=velocity*dt;
@@ -51,6 +63,16 @@ void Goompa::PerformCollisionCheckAgainstTiles(float dt)
 }
 void Goompa::Render()
 {
+    if (isCompletelyGone) return;
+
+    // Blinking effect when dead
+    if (isDead) {
+        int blinkState = (int)(deathTimer * 10);
+        if (blinkState % 2 == 0) {
+            return; // Don't draw this frame
+        }
+    }
+
     Texture2D activeTexture=texture;
     Rectangle source;
     if(isDead)
